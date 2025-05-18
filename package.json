@@ -1,11 +1,14 @@
 {
   "name": "frontinventario",
   "version": "1.0.0",
-  "description": "",
-  "scripts": {
-    "dev": "parcel public/index.html",
-    "build": "parcel build public/index.html"
+  "description": "","scripts": {
+  "dev": "parcel public/index.html",
+  "build": "parcel build public/index.html",
+  "start-backend": "ts-node src/Conexion/server.ts",
+  "dev-backend": "nodemon --watch src -e ts --exec ts-node src/Conexion/server.ts"
   },
+  
+  
   "repository": {
     "type": "git",
     "url": "git+https://github.com/LeonelVasquezP/FrontInventario.git"
@@ -18,13 +21,26 @@
   },
   "homepage": "https://github.com/LeonelVasquezP/FrontInventario#readme",
   "devDependencies": {
+    "@types/cors": "^2.8.18",
+    "@types/express": "^5.0.2",
+    "@types/mysql": "^2.15.27",
+    "@types/node": "^22.15.18",
     "@types/react": "^18.3.21",
     "@types/react-dom": "^18.3.7",
+    "nodemon": "^3.1.10",
     "parcel": "^2.14.4",
+    "ts-node": "^10.9.2",
     "typescript": "^5.8.3"
   },
   "dependencies": {
+    "bootstrap": "^4.6.2",
+    "cors": "^2.8.5",
+    "express": "^5.1.0",
+    "mysql2": "^3.14.1",
     "react": "^18.3.1",
-    "react-dom": "^18.3.1"
+    "react-dom": "^18.3.1",
+    "react-icons": "^5.5.0",
+    "react-router": "^6.13.0",
+    "react-router-dom": "^6.13.0"
   }
 }

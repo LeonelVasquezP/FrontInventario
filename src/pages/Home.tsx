@@ -1,13 +1,27 @@
-import * as React from 'react';
+import React from "react";
+// import CardItems from "../components/CardItem";
 
-interface HomeProps {
-  message: string;
-}
+type Item = {
+  title: string;
+  description: string;
+};
 
-export const Home: React.FC<HomeProps> = ({ message }) => {
+type HomeProps = {
+  items: Item[];
+};
+
+function Home({ items }: HomeProps) {
   return (
-    <div>
-      <h1>{message}</h1>
+    <div className="container bg-primary pt-5">
+      <div className="row">
+        {items.map((item, index) => (
+          <div className="col-md-4 mb-4" key={index}>
+        
+          </div>
+        ))}
+      </div>
     </div>
   );
-};
+}
+
+export default Home;
