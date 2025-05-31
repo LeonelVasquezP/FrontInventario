@@ -8,6 +8,7 @@ import Login from './pages/Login';
 import Home from './pages/Home';
 import Productos from './pages/master/Productos';
 import Proveedores from './pages/master/Proveedores';
+import Compras from './pages/master/Compras';
 
 function App() {
   const [items, setItems] = useState([
@@ -31,6 +32,7 @@ function App() {
                   <Route path="/home" element={<Home items={items} />} />
                   <Route path="/productos" element={<Productos />} />
                   <Route path="/proveedores" element={<Proveedores />} />
+                  <Route path="/compras" element={<Compras />} />
                 </Routes>
               </div>
             </div>

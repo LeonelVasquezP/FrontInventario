@@ -4,12 +4,19 @@ import ActionButton from '../../components/ComponentesReutilizables/ActionButton
 interface Proveedor {
   id?: number;
   nombre: string;
-  contacto: string;
+  direccion: string;
+  telefono: string;
+  correo: string;
 }
 
 const Proveedores: React.FC = () => {
   const [proveedores, setProveedores] = useState<Proveedor[]>([]);
-  const [form, setForm] = useState({ nombre: '', contacto: '' });
+  const [form, setForm] = useState<Proveedor>({
+    nombre: '',
+    direccion: '',
+    telefono: '',
+    correo: '',
+  });
   const [editId, setEditId] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -38,39 +45,35 @@ const Proveedores: React.FC = () => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    const url = editId
-      ? `http://localhost:3001/api/proveedores/${editId}`
-      : 'http://localhost:3001/api/proveedores';
+    try {
+      const url = editId
+        ? `http://localhost:3001/api/proveedores/${editId}`
+        : 'http://localhost:3001/api/proveedores';
+      const method = editId ? 'PUT' : 'POST';
 
-    const method = editId ? 'PUT' : 'POST';
-
-    fetch(url, {
-      method,
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(form),
-    })
-      .then(res => {
-        if (!res.ok) throw new Error('Error al guardar proveedor');
-        return res.json();
-      })
-      .then(() => {
-        cargarProveedores();
-        setForm({ nombre: '', contacto: '' });
-        setEditId(null);
-      })
-      .catch(err => {
-        console.error(err);
-        alert(err.message);
+      const res = await fetch(url, {
+        method,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(form),
       });
+
+      if (!res.ok) throw new Error('Error al guardar proveedor');
+
+      await res.json();
+      setForm({ nombre: '', direccion: '', telefono: '', correo: '' });
+      setEditId(null);
+      cargarProveedores();
+    } catch (error: any) {
+      alert(error.message);
+    }
   };
 
   const handleEdit = (proveedor: Proveedor) => {
-    setForm({ nombre: proveedor.nombre, contacto: proveedor.contacto });
+    setForm(proveedor);
     setEditId(proveedor.id || null);
-    setError('');
   };
 
   const handleDelete = (id: number) => {
@@ -81,12 +84,9 @@ const Proveedores: React.FC = () => {
     })
       .then(res => {
         if (!res.ok) throw new Error('Error al eliminar proveedor');
-        return res.json();
+        setProveedores(proveedores.filter(p => p.id !== id));
       })
-      .then(() => cargarProveedores())
-      .catch(err => {
-        alert(err.message);
-      });
+      .catch(err => alert(err.message));
   };
 
   if (loading) return <p>Cargando proveedores...</p>;
@@ -96,33 +96,25 @@ const Proveedores: React.FC = () => {
     <div>
       <h2>Gestión de Proveedores</h2>
       <form onSubmit={handleSubmit} style={{ marginBottom: '1rem' }}>
-        <input
-          name="nombre"
-          value={form.nombre}
-          onChange={handleChange}
-          placeholder="Nombre"
-          className="form-control mb-2"
-        />
-        <input
-          name="contacto"
-          value={form.contacto}
-          onChange={handleChange}
-          placeholder="Contacto"
-          className="form-control mb-2"
-        />
+        <input name="nombre" value={form.nombre} onChange={handleChange} placeholder="Nombre" className="form-control mb-2" />
+        <input name="direccion" value={form.direccion} onChange={handleChange} placeholder="Dirección" className="form-control mb-2" />
+        <input name="telefono" value={form.telefono} onChange={handleChange} placeholder="Teléfono" className="form-control mb-2" />
+        <input name="correo" type="email" value={form.correo} onChange={handleChange} placeholder="Correo electrónico" className="form-control mb-2" />
         <ActionButton
           label={editId !== null ? 'Actualizar Proveedor' : 'Agregar Proveedor'}
           color={editId !== null ? '#ffc107' : '#28a745'}
-          onClick={() => document.getElementById('submit-btn')?.click()}
+          onClick={() => {}}
         />
-        <button id="submit-btn" type="submit" style={{ display: 'none' }} />
+        <button type="submit" style={{ display: 'none' }} />
       </form>
 
       <table className="table">
         <thead>
           <tr>
             <th>Nombre</th>
-            <th>Contacto</th>
+            <th>Dirección</th>
+            <th>Teléfono</th>
+            <th>Correo</th>
             <th>Acciones</th>
           </tr>
         </thead>
@@ -130,10 +122,12 @@ const Proveedores: React.FC = () => {
           {proveedores.map(prov => (
             <tr key={prov.id}>
               <td>{prov.nombre}</td>
-              <td>{prov.contacto}</td>
+              <td>{prov.direccion}</td>
+              <td>{prov.telefono}</td>
+              <td>{prov.correo}</td>
               <td>
                 <ActionButton label="✏️" onClick={() => handleEdit(prov)} color="#ffc107" />
-                <ActionButton label="🗑️" onClick={() => prov.id && handleDelete(prov.id)} color="#dc3545" />
+                <ActionButton label="🗑️" onClick={() => handleDelete(prov.id!)} color="#dc3545" />
               </td>
             </tr>
           ))}
