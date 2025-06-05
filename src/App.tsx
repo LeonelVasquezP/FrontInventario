@@ -11,11 +11,6 @@ import Proveedores from './pages/master/Proveedores';
 import Compras from './pages/master/Compras';
 
 function App() {
-  const [items, setItems] = useState([
-    { title: "Progra Web", description: "Clase de los sábados" },
-    { title: "Base de Datos", description: "Diseño y consultas SQL" },
-    { title: "Redes", description: "Modelos OSI y TCP/IP" }
-  ]);
 
   return (
     <Router>
@@ -29,10 +24,8 @@ function App() {
               <div style={{ marginLeft: '220px', marginTop: '56px', padding: '20px', flex: 1 }}>
                 <Routes>
                   <Route path="/" element={<Navigate to="/home" />} />
-                  <Route path="/home" element={<Home items={items} />} />
                   <Route path="/productos" element={<Productos />} />
                   <Route path="/proveedores" element={<Proveedores />} />
-                  <Route path="/compras" element={<Compras />} />
                 </Routes>
               </div>
             </div>

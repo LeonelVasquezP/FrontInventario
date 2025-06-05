@@ -1,4 +1,6 @@
 import React, { useEffect, useState } from 'react';
+import ActionButton from '../../components/ComponentesReutilizables/ActionButton';
+
 
 interface Proveedor {
   id: number;
