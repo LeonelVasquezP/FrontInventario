@@ -12,6 +12,9 @@ import Compras from './pages/master/Compras';
 import Stock from './pages/master/Stock';
 import Clientes from './pages/master/Clientes';
 import Recibidos from './pages/master/Recibidos';
+import Pedidos from './pages/master/Pedidos';
+import Devoluciones from './pages/master/Devoluciones';
+import AlmacenComponent from './pages/master/Almacenes';
 
 function App() {
 
@@ -33,6 +36,9 @@ function App() {
                    <Route path="/stock" element={<Stock />} />
                    <Route path="/clientes" element={<Clientes />} />
                    <Route path="/recibidos" element={<Recibidos />} />
+                   <Route path="/pedidos" element={<Pedidos />} />
+                  <Route path="/devoluciones" element={<Devoluciones />} />
+                  <Route path="/almacenes" element={<AlmacenComponent />} />
                 </Routes>
               </div>
             </div>

@@ -21,7 +21,7 @@ function SideNavbar(){
                 <Link to="/recibidos" className="nav-link text-white">
                   <FaHome className="me-2" /> Recibidos
                 </Link>
-                <Link to="/" className="nav-link text-white">
+                <Link to="/devoluciones" className="nav-link text-white">
                   <FaHome className="me-2" /> Devoluciones
                 </Link>
                 <Link to="/stock" className="nav-link text-white">
@@ -33,14 +33,11 @@ function SideNavbar(){
                 <Link to="/productos" className="nav-link text-white">
                 <FaHome className="me-2" /> Productos
                 </Link>
-                <Link to="/" className="nav-link text-white">
+                <Link to="/almacenes" className="nav-link text-white">
                   <FaHome className="me-2" /> Almacenes
                 </Link>
                 <Link to="/clientes" className="nav-link text-white">
                   <FaHome className="me-2" /> Clientes
-                </Link>
-                <Link to="/" className="nav-link text-white">
-                  <FaHome className="me-2" /> Componentes Resividos
                 </Link>
                 <Link to="/" className="nav-link text-white">
                   <FaHome className="me-2" /> Componentes de Adminsitracion
