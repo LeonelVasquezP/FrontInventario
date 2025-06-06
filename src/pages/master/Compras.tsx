@@ -19,6 +19,24 @@ interface Compra {
   fecha?: string;
 }
 
+// Datos simulados
+const productosFake: Producto[] = [
+  { id: 1, nombre: 'Producto A' },
+  { id: 2, nombre: 'Producto B' },
+  { id: 3, nombre: 'Producto C' },
+];
+
+const proveedoresFake: Proveedor[] = [
+  { id: 1, nombre: 'Proveedor X' },
+  { id: 2, nombre: 'Proveedor Y' },
+  { id: 3, nombre: 'Proveedor Z' },
+];
+
+const comprasFake: Compra[] = [
+  { id: 1, productoId: 1, proveedorId: 2, cantidad: 10 },
+  { id: 2, productoId: 3, proveedorId: 1, cantidad: 5 },
+];
+
 const Compras: React.FC = () => {
   const [compras, setCompras] = useState<Compra[]>([]);
   const [productos, setProductos] = useState<Producto[]>([]);
@@ -26,75 +44,54 @@ const Compras: React.FC = () => {
   const [form, setForm] = useState<Compra>({
     productoId: 0,
     proveedorId: 0,
-    cantidad: 0
+    cantidad: 0,
   });
   const [editId, setEditId] = useState<number | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
-
-  const cargarDatos = async () => {
-    try {
-      const [comprasRes, productosRes, proveedoresRes] = await Promise.all([
-        fetch('http://localhost:3001/api/compras'),
-        fetch('http://localhost:3001/api/productos'),
-        fetch('http://localhost:3001/api/proveedores')
-      ]);
-
-      if (!comprasRes.ok || !productosRes.ok || !proveedoresRes.ok) {
-        throw new Error('Error al cargar datos');
-      }
-
-      const [comprasData, productosData, proveedoresData] = await Promise.all([
-        comprasRes.json(),
-        productosRes.json(),
-        proveedoresRes.json()
-      ]);
-
-      setCompras(comprasData);
-      setProductos(productosData);
-      setProveedores(proveedoresData);
-      setLoading(false);
-    } catch (err: any) {
-      setError(err.message || 'Error desconocido');
-      setLoading(false);
-    }
-  };
 
   useEffect(() => {
-    cargarDatos();
+    // Simula carga datos desde backend
+    setTimeout(() => {
+      setProductos(productosFake);
+      setProveedores(proveedoresFake);
+      setCompras(comprasFake);
+    }, 300);
   }, []);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    setForm({ ...form, [e.target.name]: e.target.name === 'cantidad' ? Number(e.target.value) : Number(e.target.value) });
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
+    setForm({
+      ...form,
+      [e.target.name]:
+        e.target.name === 'cantidad' || e.target.name === 'productoId' || e.target.name === 'proveedorId'
+          ? Number(e.target.value)
+          : e.target.value,
+    });
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    try {
-      if (editId !== null) {
-        // Editar
-        const res = await fetch(`http://localhost:3001/api/compras/${editId}`, {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(form),
-        });
-        if (!res.ok) throw new Error('Error al actualizar compra');
-      } else {
-        // Crear
-        const res = await fetch('http://localhost:3001/api/compras', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(form),
-        });
-        if (!res.ok) throw new Error('Error al agregar compra');
-      }
 
-      setForm({ productoId: 0, proveedorId: 0, cantidad: 0 });
-      setEditId(null);
-      cargarDatos();
-    } catch (err: any) {
-      alert(err.message);
+    if (form.productoId === 0 || form.proveedorId === 0 || form.cantidad <= 0) {
+      alert('Por favor, complete todos los campos correctamente.');
+      return;
     }
+
+    if (editId !== null) {
+      // Actualizar compra local
+      setCompras(
+        compras.map(c =>
+          c.id === editId ? { ...form, id: editId } : c
+        )
+      );
+    } else {
+      // Agregar nueva compra con id generado
+      const newId = compras.length > 0 ? Math.max(...compras.map(c => c.id || 0)) + 1 : 1;
+      setCompras([...compras, { ...form, id: newId }]);
+    }
+
+    setForm({ productoId: 0, proveedorId: 0, cantidad: 0 });
+    setEditId(null);
   };
 
   const handleEdit = (compra: Compra) => {
@@ -106,22 +103,17 @@ const Compras: React.FC = () => {
     setEditId(compra.id || null);
   };
 
-  const handleDelete = async (id: number) => {
+  const handleDelete = (id: number) => {
     if (!window.confirm('¿Eliminar esta compra?')) return;
-    try {
-      const res = await fetch(`http://localhost:3001/api/compras/${id}`, { method: 'DELETE' });
-      if (!res.ok) throw new Error('Error al eliminar compra');
-      setCompras(compras.filter(c => c.id !== id));
-    } catch (err: any) {
-      alert(err.message);
-    }
+
+    setCompras(compras.filter(c => c.id !== id));
   };
 
-  const obtenerNombreProducto = (id: number) => productos.find(p => p.id === id)?.nombre || 'Desconocido';
-  const obtenerNombreProveedor = (id: number) => proveedores.find(p => p.id === id)?.nombre || 'Desconocido';
+  const obtenerNombreProducto = (id: number) =>
+    productos.find(p => p.id === id)?.nombre || 'Desconocido';
 
-  if (loading) return <p>Cargando compras...</p>;
-  if (error) return <p style={{ color: 'red' }}>Error: {error}</p>;
+  const obtenerNombreProveedor = (id: number) =>
+    proveedores.find(p => p.id === id)?.nombre || 'Desconocido';
 
   return (
     <div>
@@ -135,7 +127,9 @@ const Compras: React.FC = () => {
         >
           <option value={0}>Selecciona un producto</option>
           {productos.map(prod => (
-            <option key={prod.id} value={prod.id}>{prod.nombre}</option>
+            <option key={prod.id} value={prod.id}>
+              {prod.nombre}
+            </option>
           ))}
         </select>
 
@@ -147,7 +141,9 @@ const Compras: React.FC = () => {
         >
           <option value={0}>Selecciona un proveedor</option>
           {proveedores.map(prov => (
-            <option key={prov.id} value={prov.id}>{prov.nombre}</option>
+            <option key={prov.id} value={prov.id}>
+              {prov.nombre}
+            </option>
           ))}
         </select>
 
@@ -158,6 +154,7 @@ const Compras: React.FC = () => {
           onChange={handleChange}
           placeholder="Cantidad"
           className="form-control mb-2"
+          min={1}
         />
 
         <ActionButton
@@ -184,11 +181,26 @@ const Compras: React.FC = () => {
               <td>{obtenerNombreProveedor(compra.proveedorId)}</td>
               <td>{compra.cantidad}</td>
               <td>
-                <ActionButton label="✏️" onClick={() => handleEdit(compra)} color="#ffc107" />
-                <ActionButton label="🗑️" onClick={() => handleDelete(compra.id!)} color="#dc3545" />
+                <ActionButton
+                  label="✏️"
+                  onClick={() => handleEdit(compra)}
+                  color="#ffc107"
+                />
+                <ActionButton
+                  label="🗑️"
+                  onClick={() => handleDelete(compra.id!)}
+                  color="#dc3545"
+                />
               </td>
             </tr>
           ))}
+          {compras.length === 0 && (
+            <tr>
+              <td colSpan={4} style={{ textAlign: 'center' }}>
+                No hay compras registradas.
+              </td>
+            </tr>
+          )}
         </tbody>
       </table>
     </div>

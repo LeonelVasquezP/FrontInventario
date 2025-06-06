@@ -1,36 +1,30 @@
 import React, { useEffect, useState } from 'react';
-import ActionButton from '../../components/ComponentesReutilizables/ActionButton';
 
 interface Stock {
-  id?: number;
+  id: number;
   producto_id: number;
   nombre_producto: string;
   cantidad: number;
 }
+
+// Datos simulados de stock
+const stockFake: Stock[] = [
+  { id: 1, producto_id: 1, nombre_producto: 'Producto A', cantidad: 100 },
+  { id: 2, producto_id: 2, nombre_producto: 'Producto B', cantidad: 50 },
+  { id: 3, producto_id: 3, nombre_producto: 'Producto C', cantidad: 20 },
+];
 
 const Stock: React.FC = () => {
   const [stocks, setStocks] = useState<Stock[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
-  const cargarStock = () => {
-    fetch('http://localhost:3001/api/stock')
-      .then(res => {
-        if (!res.ok) throw new Error('Error al obtener el stock');
-        return res.json();
-      })
-      .then(data => {
-        setStocks(data);
-        setLoading(false);
-      })
-      .catch(err => {
-        setError(err.message || 'Error desconocido');
-        setLoading(false);
-      });
-  };
-
   useEffect(() => {
-    cargarStock();
+    // Simular carga datos
+    setTimeout(() => {
+      setStocks(stockFake);
+      setLoading(false);
+    }, 300);
   }, []);
 
   if (loading) return <p>Cargando stock...</p>;
@@ -55,6 +49,13 @@ const Stock: React.FC = () => {
               <td>{item.cantidad}</td>
             </tr>
           ))}
+          {stocks.length === 0 && (
+            <tr>
+              <td colSpan={3} style={{ textAlign: 'center' }}>
+                No hay stock disponible
+              </td>
+            </tr>
+          )}
         </tbody>
       </table>
     </div>

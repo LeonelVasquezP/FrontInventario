@@ -10,6 +10,7 @@ import Productos from './pages/master/Productos';
 import Proveedores from './pages/master/Proveedores';
 import Compras from './pages/master/Compras';
 import Stock from './pages/master/Stock';
+import Clientes from './pages/master/Clientes';
 
 function App() {
 
@@ -29,6 +30,7 @@ function App() {
                   <Route path="/proveedores" element={<Proveedores />} />
                   <Route path="/compras" element={<Compras />} />
                    <Route path="/stock" element={<Stock />} />
+                   <Route path="/clientes" element={<Clientes />} />
                 </Routes>
               </div>
             </div>

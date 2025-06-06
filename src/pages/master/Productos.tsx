@@ -9,6 +9,13 @@ interface Producto {
   precio: number;
 }
 
+// Datos simulados locales para mostrar
+const productosFake: Producto[] = [
+  { id: 1, nombre: 'Producto A', descripcion: 'Descripción A', cantidad: 10, precio: 25.5 },
+  { id: 2, nombre: 'Producto B', descripcion: 'Descripción B', cantidad: 5, precio: 12.0 },
+  { id: 3, nombre: 'Producto C', descripcion: 'Descripción C', cantidad: 20, precio: 8.75 },
+];
+
 const Productos: React.FC = () => {
   const [productos, setProductos] = useState<Producto[]>([]);
   const [form, setForm] = useState<Producto>({
@@ -18,96 +25,37 @@ const Productos: React.FC = () => {
     precio: 0,
   });
   const [editId, setEditId] = useState<number | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
-
-const cargarProductos = () => {
-  fetch('http://localhost:3001/api/productos')
-    .then(res => {
-      if (!res.ok) throw new Error('Error al obtener productos');
-      return res.json();
-    })
-    .then(data => {
-      setProductos(data);
-      setLoading(false);
-    })
-    .catch(err => {
-      setError(err.message || 'Error desconocido');
-      setLoading(false);
-    });
-};
-
-const actualizarProducto = () => {
-  if (editId === null) return;
-
-  fetch(`http://localhost:3001/api/productos/${editId}`, {
-    method: 'PUT',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(form),
-  })
-    .then(res => {
-      if (!res.ok) throw new Error('Error al actualizar producto');
-      return res.json();
-    })
-    .then(() => {
-      cargarProductos(); // cargar la lista actualizada
-      setEditId(null);
-      setForm({ nombre: '', descripcion: '', cantidad: 0, precio: 0 });
-    })
-    .catch(err => {
-      console.error(err);
-      setError(err.message);
-    });
-};
-
 
   useEffect(() => {
-    cargarProductos();
+    // Simula carga de productos desde backend
+    setTimeout(() => {
+      setProductos(productosFake);
+    }, 500);
   }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setForm({ ...form, [e.target.name]: e.target.name === 'cantidad' || e.target.name === 'precio' ? Number(e.target.value) : e.target.value });
+    setForm({ 
+      ...form, 
+      [e.target.name]: e.target.name === 'cantidad' || e.target.name === 'precio' 
+        ? Number(e.target.value) 
+        : e.target.value 
+    });
   };
 
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
 
-  const handleSubmit = async (e: React.FormEvent) => {
-  e.preventDefault();
-
-  try {
     if (editId !== null) {
-      // Editar producto
-      const res = await fetch(`http://localhost:3001/api/productos/${editId}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(form),
-      });
-
-      if (!res.ok) throw new Error('Error al actualizar producto');
-      
-      await res.json();
-      setEditId(null);
+      // Actualizar producto en arreglo local
+      setProductos(productos.map(p => (p.id === editId ? { ...form, id: editId } : p)));
     } else {
-      // Agregar producto
-      const res = await fetch('http://localhost:3001/api/productos', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(form),
-      });
-
-      if (!res.ok) throw new Error('Error al agregar producto');
-
-      await res.json();
+      // Agregar nuevo producto con id ficticio
+      const newId = productos.length > 0 ? Math.max(...productos.map(p => p.id || 0)) + 1 : 1;
+      setProductos([...productos, { ...form, id: newId }]);
     }
-
     setForm({ nombre: '', descripcion: '', cantidad: 0, precio: 0 });
-    cargarProductos(); // Refresca lista después de confirmar respuesta
-
-  } catch (error: any) {
-    alert(error.message);
-  }
-};
-
-
+    setEditId(null);
+  };
 
   const handleEdit = (producto: Producto) => {
     setForm(producto);
@@ -117,18 +65,8 @@ const actualizarProducto = () => {
   const handleDelete = (id: number) => {
     if (!window.confirm('¿Estás seguro de eliminar este producto?')) return;
 
-    fetch(`http://localhost:3001/api/productos/${id}`, {
-      method: 'DELETE',
-    })
-      .then(res => {
-        if (!res.ok) throw new Error('Error al eliminar producto');
-        setProductos(productos.filter(p => p.id !== id));
-      })
-      .catch(err => alert(err.message));
+    setProductos(productos.filter(p => p.id !== id));
   };
-
-  if (loading) return <p>Cargando productos...</p>;
-  if (error) return <p style={{ color: 'red' }}>Error: {error}</p>;
 
   return (
     <div>
@@ -162,7 +100,7 @@ const actualizarProducto = () => {
               <td>{prod.nombre}</td>
               <td>{prod.descripcion}</td>
               <td>{prod.cantidad}</td>
-              <td>{Number(prod.precio).toFixed(2)}</td> 
+              <td>{prod.precio.toFixed(2)}</td>
               <td>
                 <ActionButton label="✏️" onClick={() => handleEdit(prod)} color="#ffc107" />
                 <ActionButton label="🗑️" onClick={() => handleDelete(prod.id!)} color="#dc3545" />

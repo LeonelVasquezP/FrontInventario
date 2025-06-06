@@ -33,7 +33,7 @@ function SideNavbar(){
                 <Link to="/" className="nav-link text-white">
                   <FaHome className="me-2" /> Almacenes
                 </Link>
-                <Link to="/" className="nav-link text-white">
+                <Link to="/clientes" className="nav-link text-white">
                   <FaHome className="me-2" /> Clientes
                 </Link>
                 <Link to="/" className="nav-link text-white">

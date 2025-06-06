@@ -9,6 +9,13 @@ interface Proveedor {
   correo: string;
 }
 
+// Datos simulados locales para mostrar
+const proveedoresFake: Proveedor[] = [
+  { id: 1, nombre: 'Proveedor A', direccion: 'Calle Falsa 123', telefono: '555-1234', correo: 'a@proveedores.com' },
+  { id: 2, nombre: 'Proveedor B', direccion: 'Avenida Siempre Viva 742', telefono: '555-5678', correo: 'b@proveedores.com' },
+  { id: 3, nombre: 'Proveedor C', direccion: 'Boulevard Central 45', telefono: '555-9012', correo: 'c@proveedores.com' },
+];
+
 const Proveedores: React.FC = () => {
   const [proveedores, setProveedores] = useState<Proveedor[]>([]);
   const [form, setForm] = useState<Proveedor>({
@@ -18,57 +25,29 @@ const Proveedores: React.FC = () => {
     correo: '',
   });
   const [editId, setEditId] = useState<number | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
 
-  const cargarProveedores = () => {
-    fetch('http://localhost:3001/api/proveedores')
-      .then(res => {
-        if (!res.ok) throw new Error('Error al obtener proveedores');
-        return res.json();
-      })
-      .then(data => {
-        setProveedores(data);
-        setLoading(false);
-      })
-      .catch(err => {
-        setError(err.message || 'Error desconocido');
-        setLoading(false);
-      });
-  };
 
   useEffect(() => {
-    cargarProveedores();
+    setTimeout(() => {
+      setProveedores(proveedoresFake);
+    }, 500);
   }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    try {
-      const url = editId
-        ? `http://localhost:3001/api/proveedores/${editId}`
-        : 'http://localhost:3001/api/proveedores';
-      const method = editId ? 'PUT' : 'POST';
-
-      const res = await fetch(url, {
-        method,
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(form),
-      });
-
-      if (!res.ok) throw new Error('Error al guardar proveedor');
-
-      await res.json();
-      setForm({ nombre: '', direccion: '', telefono: '', correo: '' });
-      setEditId(null);
-      cargarProveedores();
-    } catch (error: any) {
-      alert(error.message);
+    if (editId !== null) {
+      setProveedores(proveedores.map(p => (p.id === editId ? { ...form, id: editId } : p)));
+    } else {
+      const newId = proveedores.length > 0 ? Math.max(...proveedores.map(p => p.id || 0)) + 1 : 1;
+      setProveedores([...proveedores, { ...form, id: newId }]);
     }
+    setForm({ nombre: '', direccion: '', telefono: '', correo: '' });
+    setEditId(null);
   };
 
   const handleEdit = (proveedor: Proveedor) => {
@@ -79,18 +58,8 @@ const Proveedores: React.FC = () => {
   const handleDelete = (id: number) => {
     if (!window.confirm('¿Estás seguro de eliminar este proveedor?')) return;
 
-    fetch(`http://localhost:3001/api/proveedores/${id}`, {
-      method: 'DELETE',
-    })
-      .then(res => {
-        if (!res.ok) throw new Error('Error al eliminar proveedor');
-        setProveedores(proveedores.filter(p => p.id !== id));
-      })
-      .catch(err => alert(err.message));
+    setProveedores(proveedores.filter(p => p.id !== id));
   };
-
-  if (loading) return <p>Cargando proveedores...</p>;
-  if (error) return <p style={{ color: 'red' }}>Error: {error}</p>;
 
   return (
     <div>
