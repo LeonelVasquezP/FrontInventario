@@ -11,6 +11,7 @@ import Proveedores from './pages/master/Proveedores';
 import Compras from './pages/master/Compras';
 import Stock from './pages/master/Stock';
 import Clientes from './pages/master/Clientes';
+import Recibidos from './pages/master/Recibidos';
 
 function App() {
 
@@ -31,6 +32,7 @@ function App() {
                   <Route path="/compras" element={<Compras />} />
                    <Route path="/stock" element={<Stock />} />
                    <Route path="/clientes" element={<Clientes />} />
+                   <Route path="/recibidos" element={<Recibidos />} />
                 </Routes>
               </div>
             </div>

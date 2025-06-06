@@ -15,7 +15,10 @@ function SideNavbar(){
                 <Link to="/compras" className="nav-link text-white">
                   <FaHome className="me-2" /> Compras
                 </Link>
-                <Link to="/" className="nav-link text-white">
+                <Link to="/pedidos" className="nav-link text-white">
+                  <FaHome className="me-2" /> Pedidos
+                </Link>
+                <Link to="/recibidos" className="nav-link text-white">
                   <FaHome className="me-2" /> Recibidos
                 </Link>
                 <Link to="/" className="nav-link text-white">

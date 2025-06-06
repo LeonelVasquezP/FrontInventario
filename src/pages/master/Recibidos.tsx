@@ -11,13 +11,12 @@ interface Proveedor {
   nombre: string;
 }
 
-interface Pedido {
+interface Recibido {
   id?: number;
   productoId: number;
   proveedorId: number;
   cantidad: number;
-  fechaPedido?: string;
-  estado: 'Pendiente' | 'Enviado' | 'Recibido';
+  fechaRecibido?: string;
 }
 
 // Datos simulados para productos y proveedores
@@ -31,26 +30,25 @@ const proveedoresFake: Proveedor[] = [
   { id: 2, nombre: 'Proveedor Y' },
 ];
 
-// Datos simulados pedidos
-const pedidosFake: Pedido[] = [
-  { id: 1, productoId: 1, proveedorId: 1, cantidad: 50, fechaPedido: '2025-06-01', estado: 'Pendiente' },
-  { id: 2, productoId: 2, proveedorId: 2, cantidad: 100, fechaPedido: '2025-06-02', estado: 'Enviado' },
+// Datos simulados recibidos
+const recibidosFake: Recibido[] = [
+  { id: 1, productoId: 1, proveedorId: 1, cantidad: 20, fechaRecibido: '2025-06-03' },
+  { id: 2, productoId: 2, proveedorId: 2, cantidad: 80, fechaRecibido: '2025-06-04' },
 ];
 
-const Pedidos: React.FC = () => {
-  const [pedidos, setPedidos] = useState<Pedido[]>([]);
-  const [form, setForm] = useState<Pedido>({
+const Recibidos: React.FC = () => {
+  const [recibidos, setRecibidos] = useState<Recibido[]>([]);
+  const [form, setForm] = useState<Recibido>({
     productoId: 0,
     proveedorId: 0,
     cantidad: 0,
-    estado: 'Pendiente',
   });
   const [editId, setEditId] = useState<number | null>(null);
 
   useEffect(() => {
     // Simular carga datos
     setTimeout(() => {
-      setPedidos(pedidosFake);
+      setRecibidos(recibidosFake);
     }, 500);
   }, []);
 
@@ -65,23 +63,23 @@ const Pedidos: React.FC = () => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (editId !== null) {
-      setPedidos(pedidos.map(p => (p.id === editId ? { ...form, id: editId } : p)));
+      setRecibidos(recibidos.map(r => (r.id === editId ? { ...form, id: editId, fechaRecibido: r.fechaRecibido } : r)));
     } else {
-      const newId = pedidos.length > 0 ? Math.max(...pedidos.map(p => p.id || 0)) + 1 : 1;
-      setPedidos([...pedidos, { ...form, id: newId, fechaPedido: new Date().toISOString().split('T')[0] }]);
+      const newId = recibidos.length > 0 ? Math.max(...recibidos.map(r => r.id || 0)) + 1 : 1;
+      setRecibidos([...recibidos, { ...form, id: newId, fechaRecibido: new Date().toISOString().split('T')[0] }]);
     }
-    setForm({ productoId: 0, proveedorId: 0, cantidad: 0, estado: 'Pendiente' });
+    setForm({ productoId: 0, proveedorId: 0, cantidad: 0 });
     setEditId(null);
   };
 
-  const handleEdit = (pedido: Pedido) => {
-    setForm(pedido);
-    setEditId(pedido.id || null);
+  const handleEdit = (recibido: Recibido) => {
+    setForm(recibido);
+    setEditId(recibido.id || null);
   };
 
   const handleDelete = (id: number) => {
-    if (!window.confirm('¿Estás seguro de eliminar este pedido?')) return;
-    setPedidos(pedidos.filter(p => p.id !== id));
+    if (!window.confirm('¿Estás seguro de eliminar este registro de recibido?')) return;
+    setRecibidos(recibidos.filter(r => r.id !== id));
   };
 
   const obtenerNombreProducto = (id: number) => productosFake.find(p => p.id === id)?.nombre || 'Desconocido';
@@ -89,16 +87,16 @@ const Pedidos: React.FC = () => {
 
   return (
     <div>
-      <h2>Gestión de Pedidos</h2>
+      <h2>Gestión de Productos Recibidos</h2>
       <form onSubmit={handleSubmit} style={{ marginBottom: '1rem' }}>
-        <select name="productoId" value={form.productoId} onChange={handleChange} className="form-control mb-2">
+        <select name="productoId" value={form.productoId} onChange={handleChange} className="form-control mb-2" required>
           <option value={0}>Selecciona un producto</option>
           {productosFake.map(prod => (
             <option key={prod.id} value={prod.id}>{prod.nombre}</option>
           ))}
         </select>
 
-        <select name="proveedorId" value={form.proveedorId} onChange={handleChange} className="form-control mb-2">
+        <select name="proveedorId" value={form.proveedorId} onChange={handleChange} className="form-control mb-2" required>
           <option value={0}>Selecciona un proveedor</option>
           {proveedoresFake.map(prov => (
             <option key={prov.id} value={prov.id}>{prov.nombre}</option>
@@ -111,19 +109,13 @@ const Pedidos: React.FC = () => {
           min={1}
           value={form.cantidad}
           onChange={handleChange}
-          placeholder="Cantidad"
+          placeholder="Cantidad recibida"
           className="form-control mb-2"
           required
         />
 
-        <select name="estado" value={form.estado} onChange={handleChange} className="form-control mb-2">
-          <option value="Pendiente">Pendiente</option>
-          <option value="Enviado">Enviado</option>
-          <option value="Recibido">Recibido</option>
-        </select>
-
         <ActionButton
-          label={editId !== null ? 'Actualizar Pedido' : 'Agregar Pedido'}
+          label={editId !== null ? 'Actualizar Registro' : 'Agregar Registro'}
           color={editId !== null ? '#ffc107' : '#28a745'}
           onClick={() => {}}
         />
@@ -136,22 +128,20 @@ const Pedidos: React.FC = () => {
             <th>Producto</th>
             <th>Proveedor</th>
             <th>Cantidad</th>
-            <th>Fecha Pedido</th>
-            <th>Estado</th>
+            <th>Fecha Recibido</th>
             <th>Acciones</th>
           </tr>
         </thead>
         <tbody>
-          {pedidos.map(pedido => (
-            <tr key={pedido.id}>
-              <td>{obtenerNombreProducto(pedido.productoId)}</td>
-              <td>{obtenerNombreProveedor(pedido.proveedorId)}</td>
-              <td>{pedido.cantidad}</td>
-              <td>{pedido.fechaPedido}</td>
-              <td>{pedido.estado}</td>
+          {recibidos.map(rec => (
+            <tr key={rec.id}>
+              <td>{obtenerNombreProducto(rec.productoId)}</td>
+              <td>{obtenerNombreProveedor(rec.proveedorId)}</td>
+              <td>{rec.cantidad}</td>
+              <td>{rec.fechaRecibido}</td>
               <td>
-                <ActionButton label="✏️" onClick={() => handleEdit(pedido)} color="#ffc107" />
-                <ActionButton label="🗑️" onClick={() => handleDelete(pedido.id!)} color="#dc3545" />
+                <ActionButton label="✏️" onClick={() => handleEdit(rec)} color="#ffc107" />
+                <ActionButton label="🗑️" onClick={() => handleDelete(rec.id!)} color="#dc3545" />
               </td>
             </tr>
           ))}
@@ -161,4 +151,4 @@ const Pedidos: React.FC = () => {
   );
 };
 
-export default Pedidos;
+export default Recibidos;
