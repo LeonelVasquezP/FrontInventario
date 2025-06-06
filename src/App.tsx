@@ -9,6 +9,7 @@ import Home from './pages/Home';
 import Productos from './pages/master/Productos';
 import Proveedores from './pages/master/Proveedores';
 import Compras from './pages/master/Compras';
+import Stock from './pages/master/Stock';
 
 function App() {
 
@@ -26,6 +27,8 @@ function App() {
                   <Route path="/" element={<Navigate to="/home" />} />
                   <Route path="/productos" element={<Productos />} />
                   <Route path="/proveedores" element={<Proveedores />} />
+                  <Route path="/compras" element={<Compras />} />
+                   <Route path="/stock" element={<Stock />} />
                 </Routes>
               </div>
             </div>

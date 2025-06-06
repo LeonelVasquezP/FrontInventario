@@ -21,7 +21,7 @@ function SideNavbar(){
                 <Link to="/" className="nav-link text-white">
                   <FaHome className="me-2" /> Devoluciones
                 </Link>
-                <Link to="/" className="nav-link text-white">
+                <Link to="/stock" className="nav-link text-white">
                   <FaHome className="me-2" /> Stock
                 </Link>
                 <Link to="/proveedores" className="nav-link text-white">
