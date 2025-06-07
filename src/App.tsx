@@ -15,7 +15,10 @@ import Recibidos from './pages/master/Recibidos';
 import Pedidos from './pages/master/Pedidos';
 import Devoluciones from './pages/master/Devoluciones';
 import AlmacenComponent from './pages/master/Almacenes';
-
+import Dashboard from './pages/master/Dashboard';
+import Departamentos from './pages/master/Departamentos';
+import Roles from './pages/master/Roles';
+import Usuarios from './pages/master/Usuarios';
 function App() {
 
   return (
@@ -39,6 +42,10 @@ function App() {
                    <Route path="/pedidos" element={<Pedidos />} />
                   <Route path="/devoluciones" element={<Devoluciones />} />
                   <Route path="/almacenes" element={<AlmacenComponent />} />
+                  <Route path="/dashboard" element={<Dashboard />} />
+                  <Route path="/departamentos" element={<Departamentos />} />
+                  <Route path="/roles" element={<Roles />} />
+                  <Route path="/usuarios" element={<Usuarios />} />
                 </Routes>
               </div>
             </div>

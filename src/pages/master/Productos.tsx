@@ -84,31 +84,46 @@ const Productos: React.FC = () => {
         <button type="submit" style={{ display: 'none' }} />
       </form>
 
-      <table className="table">
-        <thead>
-          <tr>
-            <th>Nombre</th>
-            <th>Descripción</th>
-            <th>Cantidad</th>
-            <th>Precio</th>
-            <th>Acciones</th>
+       <table className="table table-hover align-middle shadow-sm border rounded bg-white">
+      <thead className="table-light">
+        <tr>
+          <th>Nombre</th>
+          <th>Descripción</th>
+          <th>Cantidad</th>
+          <th>Precio</th>
+          <th className="text-center">Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        {productos.map(prod => (
+          <tr key={prod.id}>
+            <td>{prod.nombre}</td>
+            <td>{prod.descripcion}</td>
+            <td>
+              {prod.cantidad}{' '}
+              {prod.cantidad <= 5 && (
+                <span className="badge bg-danger ms-2">🛑 Abastecer</span>
+              )}
+            </td>
+            <td>${prod.precio.toFixed(2)}</td>
+            <td className="text-center">
+              <div className="d-flex justify-content-center gap-2">
+                <ActionButton
+                  label="Editar"
+                  onClick={() => handleEdit(prod)}
+                  color="#0d6efd"
+                />
+                <ActionButton
+                  label="Eliminar"
+                  onClick={() => handleDelete(prod.id!)}
+                  color="#dc3545"
+                />
+              </div>
+            </td>
           </tr>
-        </thead>
-        <tbody>
-          {productos.map(prod => (
-            <tr key={prod.id}>
-              <td>{prod.nombre}</td>
-              <td>{prod.descripcion}</td>
-              <td>{prod.cantidad}</td>
-              <td>{prod.precio.toFixed(2)}</td>
-              <td>
-                <ActionButton label="✏️" onClick={() => handleEdit(prod)} color="#ffc107" />
-                <ActionButton label="🗑️" onClick={() => handleDelete(prod.id!)} color="#dc3545" />
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+        ))}
+      </tbody>
+    </table>
     </div>
   );
 };

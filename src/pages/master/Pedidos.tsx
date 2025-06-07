@@ -130,33 +130,59 @@ const Pedidos: React.FC = () => {
         <button type="submit" style={{ display: 'none' }} />
       </form>
 
-      <table className="table">
-        <thead>
-          <tr>
-            <th>Producto</th>
-            <th>Proveedor</th>
-            <th>Cantidad</th>
-            <th>Fecha Pedido</th>
-            <th>Estado</th>
-            <th>Acciones</th>
-          </tr>
-        </thead>
-        <tbody>
-          {pedidos.map(pedido => (
-            <tr key={pedido.id}>
-              <td>{obtenerNombreProducto(pedido.productoId)}</td>
-              <td>{obtenerNombreProveedor(pedido.proveedorId)}</td>
-              <td>{pedido.cantidad}</td>
-              <td>{pedido.fechaPedido}</td>
-              <td>{pedido.estado}</td>
-              <td>
-                <ActionButton label="✏️" onClick={() => handleEdit(pedido)} color="#ffc107" />
-                <ActionButton label="🗑️" onClick={() => handleDelete(pedido.id!)} color="#dc3545" />
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+<table className="table table-hover align-middle shadow-sm border rounded bg-white">
+  <thead className="table-light">
+    <tr>
+      <th>Producto</th>
+      <th>Proveedor</th>
+      <th>Cantidad</th>
+      <th>Fecha Pedido</th>
+      <th>Estado</th>
+      <th className="text-center">Acciones</th>
+    </tr>
+  </thead>
+  <tbody>
+    {pedidos.map(pedido => (
+      <tr key={pedido.id}>
+        <td>{obtenerNombreProducto(pedido.productoId)}</td>
+        <td>{obtenerNombreProveedor(pedido.proveedorId)}</td>
+        <td>{pedido.cantidad}</td>
+        <td>{pedido.fechaPedido}</td>
+        <td>
+          <span className={`badge 
+            ${pedido.estado === 'Pendiente' ? 'bg-warning text-dark' : ''}
+            ${pedido.estado === 'Enviado' ? 'bg-info' : ''}
+            ${pedido.estado === 'Recibido' ? 'bg-success' : ''}
+          `}>
+            {pedido.estado}
+          </span>
+        </td>
+        <td className="text-center">
+          <div className="d-flex justify-content-center gap-2">
+            <ActionButton
+              label="Editar"
+              onClick={() => handleEdit(pedido)}
+              color="#0d6efd"
+            />
+            <ActionButton
+              label="Eliminar"
+              onClick={() => handleDelete(pedido.id!)}
+              color="#dc3545"
+            />
+          </div>
+        </td>
+      </tr>
+    ))}
+    {pedidos.length === 0 && (
+      <tr>
+        <td colSpan={6} className="text-center text-muted py-3">
+          No hay pedidos registrados
+        </td>
+      </tr>
+    )}
+  </tbody>
+</table>
+
     </div>
   );
 };

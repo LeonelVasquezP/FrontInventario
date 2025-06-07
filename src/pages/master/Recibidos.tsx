@@ -154,31 +154,39 @@ const Recibidos: React.FC = () => {
         <button type="submit" style={{ display: 'none' }} />
       </form>
 
-      <table className="table">
-        <thead>
-          <tr>
-            <th>Producto</th>
-            <th>Proveedor</th>
-            <th>Cantidad</th>
-            <th>Fecha</th>
-            <th>Acciones</th>
-          </tr>
-        </thead>
-        <tbody>
-          {recibidos.map(recibido => (
-            <tr key={recibido.id}>
-              <td>{obtenerNombreProducto(recibido.productoId)}</td>
-              <td>{obtenerNombreProveedor(recibido.proveedorId)}</td>
-              <td>{recibido.cantidad}</td>
-              <td>{recibido.fecha}</td>
-              <td>
-                <ActionButton label="✏️" onClick={() => handleEdit(recibido)} color="#ffc107" />
-                <ActionButton label="🗑️" onClick={() => handleDelete(recibido.id!)} color="#dc3545" />
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+<table className="table table-hover align-middle shadow-sm border rounded bg-white">
+  <thead className="table-light">
+    <tr>
+      <th>Producto</th>
+      <th>Proveedor</th>
+      <th>Cantidad</th>
+      <th>Fecha</th>
+      <th className="text-center">Acciones</th>
+    </tr>
+  </thead>
+  <tbody>
+    {recibidos.map(recibido => (
+      <tr key={recibido.id}>
+        <td>{obtenerNombreProducto(recibido.productoId)}</td>
+        <td>{obtenerNombreProveedor(recibido.proveedorId)}</td>
+        <td>{recibido.cantidad}</td>
+        <td>{recibido.fecha}</td>
+        <td className="text-center">
+          <div className="d-flex justify-content-center gap-2">
+            <ActionButton label="Editar" onClick={() => handleEdit(recibido)} color="#0d6efd" />
+            <ActionButton label="Eliminar" onClick={() => handleDelete(recibido.id!)} color="#dc3545" />
+          </div>
+        </td>
+      </tr>
+    ))}
+    {recibidos.length === 0 && (
+      <tr>
+        <td colSpan={5} className="text-center text-muted">No hay registros de recibidos.</td>
+      </tr>
+    )}
+  </tbody>
+</table>
+
     </div>
   );
 };

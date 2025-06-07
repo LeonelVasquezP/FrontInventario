@@ -1,65 +1,181 @@
 import React, { useEffect, useState } from 'react';
+import ActionButton from '../../components/ComponentesReutilizables/ActionButton';
 
 interface Stock {
-  id: number;
-  producto_id: number;
-  nombre_producto: string;
+  id?: number;
+  nombre: string;
+  descripcion: string;
   cantidad: number;
+  minimo: number;
 }
 
-// Datos simulados de stock
-const stockFake: Stock[] = [
-  { id: 1, producto_id: 1, nombre_producto: 'Producto A', cantidad: 100 },
-  { id: 2, producto_id: 2, nombre_producto: 'Producto B', cantidad: 50 },
-  { id: 3, producto_id: 3, nombre_producto: 'Producto C', cantidad: 20 },
+const mockStocks: Stock[] = [
+  { id: 1, nombre: 'Producto A', descripcion: 'Desc A', cantidad: 12, minimo: 10 },
+  { id: 2, nombre: 'Producto B', descripcion: 'Desc B', cantidad: 4, minimo: 8 },
+  { id: 3, nombre: 'Producto C', descripcion: 'Desc C', cantidad: 20, minimo: 15 },
 ];
 
-const Stock: React.FC = () => {
+const Stocks: React.FC = () => {
   const [stocks, setStocks] = useState<Stock[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
+  const [form, setForm] = useState<Stock>({
+    nombre: '',
+    descripcion: '',
+    cantidad: 0,
+    minimo: 0,
+  });
+  const [editId, setEditId] = useState<number | null>(null);
 
   useEffect(() => {
-    // Simular carga datos
-    setTimeout(() => {
-      setStocks(stockFake);
-      setLoading(false);
-    }, 300);
+    setTimeout(() => setStocks(mockStocks), 300);
   }, []);
 
-  if (loading) return <p>Cargando stock...</p>;
-  if (error) return <p style={{ color: 'red' }}>Error: {error}</p>;
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setForm({
+      ...form,
+      [e.target.name]: ['cantidad', 'minimo'].includes(e.target.name)
+        ? Number(e.target.value)
+        : e.target.value,
+    });
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (editId !== null) {
+      setStocks(stocks.map(p => (p.id === editId ? { ...form, id: editId } : p)));
+    } else {
+      const newId = stocks.length > 0 ? Math.max(...stocks.map(p => p.id || 0)) + 1 : 1;
+      setStocks([...stocks, { ...form, id: newId }]);
+    }
+    setForm({ nombre: '', descripcion: '', cantidad: 0, minimo: 0 });
+    setEditId(null);
+  };
+
+  const handleEdit = (prod: Stock) => {
+    setForm(prod);
+    setEditId(prod.id || null);
+  };
+
+  const handleDelete = (id: number) => {
+    if (!window.confirm('¿Eliminar este stock?')) return;
+    setStocks(stocks.filter(p => p.id !== id));
+  };
 
   return (
-    <div>
-      <h2>Inventario (Stock)</h2>
-      <table className="table">
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>Producto</th>
-            <th>Cantidad en Stock</th>
-          </tr>
-        </thead>
-        <tbody>
-          {stocks.map((item) => (
-            <tr key={item.id}>
-              <td>{item.id}</td>
-              <td>{item.nombre_producto}</td>
-              <td>{item.cantidad}</td>
-            </tr>
-          ))}
-          {stocks.length === 0 && (
-            <tr>
-              <td colSpan={3} style={{ textAlign: 'center' }}>
-                No hay stock disponible
-              </td>
-            </tr>
+    <div className="stocks-wrapper p-3">
+      <h2 className="mb-4">Gestión de Stocks</h2>
+
+      <form onSubmit={handleSubmit} className="stock-form card p-4 mb-4 shadow-sm">
+        <div className="row">
+          <div className="col-md-3 mb-3">
+            <input
+              name="nombre"
+              value={form.nombre}
+              onChange={handleChange}
+              placeholder="Nombre del producto"
+              className="form-control"
+              required
+            />
+          </div>
+          <div className="col-md-3 mb-3">
+            <input
+              name="descripcion"
+              value={form.descripcion}
+              onChange={handleChange}
+              placeholder="Descripción"
+              className="form-control"
+              required
+            />
+          </div>
+          <div className="col-md-2 mb-3">
+            <input
+              name="cantidad"
+              type="number"
+              value={form.cantidad}
+              onChange={handleChange}
+              placeholder="Cantidad"
+              className="form-control"
+              required
+            />
+          </div>
+          <div className="col-md-2 mb-3">
+            <input
+              name="minimo"
+              type="number"
+              value={form.minimo}
+              onChange={handleChange}
+              placeholder="Stock Mínimo"
+              className="form-control"
+              required
+            />
+          </div>
+          <div className="col-md-2 d-grid mb-3">
+            <ActionButton
+              label={editId !== null ? 'Actualizar' : 'Agregar'}
+              color={editId !== null ? '#ffc107' : '#28a745'}
+              onClick={() => {}}
+            />
+          </div>
+        </div>
+        <button type="submit" style={{ display: 'none' }} />
+      </form>
+
+      <div className="table-responsive">
+<table className="table table-hover align-middle shadow-sm border rounded bg-white">
+  <thead className="table-light">
+    <tr>
+      <th>Nombre</th>
+      <th>Descripción</th>
+      <th>Cantidad</th>
+      <th>Mínimo</th>
+      <th>Estado</th>
+      <th className="text-center">Acciones</th>
+    </tr>
+  </thead>
+  <tbody>
+    {stocks.map(stock => (
+      <tr key={stock.id}>
+        <td>{stock.nombre}</td>
+        <td>{stock.descripcion}</td>
+        <td>{stock.cantidad}</td>
+        <td>{stock.minimo}</td>
+        <td>
+          {stock.cantidad < stock.minimo ? (
+            <span className="badge bg-danger">🛑 Abastecer</span>
+          ) : (
+            <span className="badge bg-success">✅ OK</span>
           )}
-        </tbody>
-      </table>
+        </td>
+        <td className="text-center">
+          <div className="d-flex justify-content-center gap-2">
+            <ActionButton
+              label="Editar"
+              onClick={() => handleEdit(stock)}
+              color="#0d6efd"
+            />
+            <ActionButton
+              label="Eliminar"
+              onClick={() => handleDelete(stock.id!)}
+              color="#dc3545"
+            />
+          </div>
+        </td>
+      </tr>
+    ))}
+  </tbody>
+</table>
+
+      </div>
+
+      <style>{`
+        .stocks-wrapper h2 {
+          font-weight: 600;
+        }
+        .table td, .table th {
+          vertical-align: middle;
+        }
+      `}</style>
     </div>
   );
 };
 
-export default Stock;
+export default Stocks;

@@ -166,33 +166,43 @@ const Devoluciones: React.FC = () => {
         <button type="submit" style={{ display: 'none' }} />
       </form>
 
-      <table className="table">
-        <thead>
-          <tr>
-            <th>Producto</th>
-            <th>Cliente</th>
-            <th>Cantidad</th>
-            <th>Fecha</th>
-            <th>Motivo</th>
-            <th>Acciones</th>
-          </tr>
-        </thead>
-        <tbody>
-          {devoluciones.map(d => (
-            <tr key={d.id}>
-              <td>{nombreProducto(d.productoId)}</td>
-              <td>{nombreCliente(d.clienteId)}</td>
-              <td>{d.cantidad}</td>
-              <td>{d.fecha}</td>
-              <td>{d.motivo}</td>
-              <td>
-                <ActionButton label="✏️" onClick={() => handleEdit(d)} color="#ffc107" />
-                <ActionButton label="🗑️" onClick={() => handleDelete(d.id!)} color="#dc3545" />
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+      <table className="table table-hover align-middle shadow-sm border rounded bg-white">
+  <thead className="table-light">
+    <tr>
+      <th>Producto</th>
+      <th>Cliente</th>
+      <th>Cantidad</th>
+      <th>Fecha</th>
+      <th>Motivo</th>
+      <th className="text-center">Acciones</th>
+    </tr>
+  </thead>
+  <tbody>
+    {devoluciones.map(d => (
+      <tr key={d.id}>
+        <td>{nombreProducto(d.productoId)}</td>
+        <td>{nombreCliente(d.clienteId)}</td>
+        <td>{d.cantidad}</td>
+        <td>{d.fecha}</td>
+        <td className="text-muted">{d.motivo}</td>
+        <td className="text-center">
+          <div className="d-flex justify-content-center gap-2">
+            <ActionButton label="Editar" onClick={() => handleEdit(d)} color="#0d6efd" />
+            <ActionButton label="Eliminar" onClick={() => handleDelete(d.id!)} color="#dc3545" />
+          </div>
+        </td>
+      </tr>
+    ))}
+    {devoluciones.length === 0 && (
+      <tr>
+        <td colSpan={6} className="text-center text-muted py-3">
+          No hay devoluciones registradas
+        </td>
+      </tr>
+    )}
+  </tbody>
+</table>
+
     </div>
   );
 };

@@ -77,31 +77,34 @@ const Proveedores: React.FC = () => {
         <button type="submit" style={{ display: 'none' }} />
       </form>
 
-      <table className="table">
-        <thead>
-          <tr>
-            <th>Nombre</th>
-            <th>Dirección</th>
-            <th>Teléfono</th>
-            <th>Correo</th>
-            <th>Acciones</th>
-          </tr>
-        </thead>
-        <tbody>
-          {proveedores.map(prov => (
-            <tr key={prov.id}>
-              <td>{prov.nombre}</td>
-              <td>{prov.direccion}</td>
-              <td>{prov.telefono}</td>
-              <td>{prov.correo}</td>
-              <td>
-                <ActionButton label="✏️" onClick={() => handleEdit(prov)} color="#ffc107" />
-                <ActionButton label="🗑️" onClick={() => handleDelete(prov.id!)} color="#dc3545" />
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+<table className="table table-hover align-middle shadow-sm border rounded bg-white">
+  <thead className="table-light">
+    <tr>
+      <th>Nombre</th>
+      <th>Dirección</th>
+      <th>Teléfono</th>
+      <th>Correo</th>
+      <th className="text-center">Acciones</th>
+    </tr>
+  </thead>
+  <tbody>
+    {proveedores.map(prov => (
+      <tr key={prov.id}>
+        <td>{prov.nombre}</td>
+        <td>{prov.direccion}</td>
+        <td>{prov.telefono}</td>
+        <td>{prov.correo}</td>
+        <td className="text-center">
+          <div className="d-flex justify-content-center gap-2">
+            <ActionButton label="Editar" onClick={() => handleEdit(prov)} color="#0d6efd" />
+            <ActionButton label="Eliminar" onClick={() => handleDelete(prov.id!)} color="#dc3545" />
+          </div>
+        </td>
+      </tr>
+    ))}
+  </tbody>
+</table>
+
     </div>
   );
 };

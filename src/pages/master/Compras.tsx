@@ -165,44 +165,37 @@ const Compras: React.FC = () => {
         <button type="submit" style={{ display: 'none' }} />
       </form>
 
-      <table className="table">
-        <thead>
-          <tr>
-            <th>Producto</th>
-            <th>Proveedor</th>
-            <th>Cantidad</th>
-            <th>Acciones</th>
-          </tr>
-        </thead>
-        <tbody>
-          {compras.map(compra => (
-            <tr key={compra.id}>
-              <td>{obtenerNombreProducto(compra.productoId)}</td>
-              <td>{obtenerNombreProveedor(compra.proveedorId)}</td>
-              <td>{compra.cantidad}</td>
-              <td>
-                <ActionButton
-                  label="✏️"
-                  onClick={() => handleEdit(compra)}
-                  color="#ffc107"
-                />
-                <ActionButton
-                  label="🗑️"
-                  onClick={() => handleDelete(compra.id!)}
-                  color="#dc3545"
-                />
-              </td>
-            </tr>
-          ))}
-          {compras.length === 0 && (
+<table className="table table-hover shadow-sm bg-white rounded">
+          <thead className="table-light">
             <tr>
-              <td colSpan={4} style={{ textAlign: 'center' }}>
-                No hay compras registradas.
-              </td>
+              <th>Producto</th>
+              <th>Proveedor</th>
+              <th>Cantidad</th>
+              <th className="text-center">Acciones</th>
             </tr>
-          )}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {compras.length > 0 ? (
+              compras.map((compra) => (
+                <tr key={compra.id}>
+                  <td>{obtenerNombreProducto(compra.productoId)}</td>
+                  <td>{obtenerNombreProveedor(compra.proveedorId)}</td>
+                  <td>{compra.cantidad}</td>
+                  <td className="text-center">
+                    <ActionButton label="Editar"  onClick={() => handleEdit(compra)} color="#0d6efd" />
+                    <ActionButton label="Eliminar"  onClick={() => handleDelete(compra.id!)} color="#dc3545" />
+                  </td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan={4} className="text-center text-muted">
+                  No hay compras registradas.
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
     </div>
   );
 };

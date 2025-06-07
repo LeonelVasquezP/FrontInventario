@@ -1,14 +1,13 @@
 {
   "name": "frontinventario",
   "version": "1.0.0",
-  "description": "","scripts": {
-  "dev": "parcel public/index.html",
-  "build": "parcel build public/index.html",
-  "start-backend": "ts-node src/Conexion/server.ts",
-  "dev-backend": "nodemon --watch src -e ts --exec ts-node src/Conexion/server.ts"
+  "description": "",
+  "scripts": {
+    "dev": "parcel public/index.html",
+    "build": "parcel build public/index.html",
+    "start-backend": "ts-node src/Conexion/server.ts",
+    "dev-backend": "nodemon --watch src -e ts --exec ts-node src/Conexion/server.ts"
   },
-  
-  
   "repository": {
     "type": "git",
     "url": "git+https://github.com/LeonelVasquezP/FrontInventario.git"
@@ -34,10 +33,14 @@
   },
   "dependencies": {
     "bootstrap": "^4.6.2",
+    "bootstrap-icons": "^1.13.1",
+    "chart.js": "^4.4.9",
     "cors": "^2.8.5",
     "express": "^5.1.0",
     "mysql2": "^3.14.1",
     "react": "^18.3.1",
+    "react-bootstrap": "^2.10.10",
+    "react-chartjs-2": "^5.3.0",
     "react-dom": "^18.3.1",
     "react-icons": "^5.5.0",
     "react-router": "^6.13.0",
