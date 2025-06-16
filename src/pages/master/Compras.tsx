@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import ActionButton from '../../components/ComponentesReutilizables/ActionButton';
+import TablaDatos from '../../components/TablaDatos/TablaDatos';
 
 interface Producto {
   id: number;
@@ -49,23 +50,37 @@ const Compras: React.FC = () => {
   const [editId, setEditId] = useState<number | null>(null);
 
   useEffect(() => {
-    // Simula carga datos desde backend
+    fetchDataSimulada();
+  }, []);
+
+  const fetchDataSimulada = () => {
     setTimeout(() => {
       setProductos(productosFake);
       setProveedores(proveedoresFake);
       setCompras(comprasFake);
     }, 300);
-  }, []);
+  };
 
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
-  ) => {
+  const crearCompra = (nuevaCompra: Compra) => {
+    const newId = compras.length > 0 ? Math.max(...compras.map(c => c.id || 0)) + 1 : 1;
+    setCompras([...compras, { ...nuevaCompra, id: newId }]);
+  };
+
+  const actualizarCompra = (id: number, datos: Compra) => {
+    setCompras(compras.map(c => (c.id === id ? { ...datos, id } : c)));
+  };
+
+  const eliminarCompra = (id: number) => {
+    setCompras(compras.filter(c => c.id !== id));
+  };
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const { name, value } = e.target;
     setForm({
       ...form,
-      [e.target.name]:
-        e.target.name === 'cantidad' || e.target.name === 'productoId' || e.target.name === 'proveedorId'
-          ? Number(e.target.value)
-          : e.target.value,
+      [name]: name === 'cantidad' || name === 'productoId' || name === 'proveedorId'
+        ? Number(value)
+        : value,
     });
   };
 
@@ -78,16 +93,9 @@ const Compras: React.FC = () => {
     }
 
     if (editId !== null) {
-      // Actualizar compra local
-      setCompras(
-        compras.map(c =>
-          c.id === editId ? { ...form, id: editId } : c
-        )
-      );
+      actualizarCompra(editId, form);
     } else {
-      // Agregar nueva compra con id generado
-      const newId = compras.length > 0 ? Math.max(...compras.map(c => c.id || 0)) + 1 : 1;
-      setCompras([...compras, { ...form, id: newId }]);
+      crearCompra(form);
     }
 
     setForm({ productoId: 0, proveedorId: 0, cantidad: 0 });
@@ -105,8 +113,7 @@ const Compras: React.FC = () => {
 
   const handleDelete = (id: number) => {
     if (!window.confirm('¿Eliminar esta compra?')) return;
-
-    setCompras(compras.filter(c => c.id !== id));
+    eliminarCompra(id);
   };
 
   const obtenerNombreProducto = (id: number) =>
@@ -118,6 +125,7 @@ const Compras: React.FC = () => {
   return (
     <div>
       <h2>Gestión de Compras</h2>
+
       <form onSubmit={handleSubmit} style={{ marginBottom: '1rem' }}>
         <select
           name="productoId"
@@ -160,42 +168,53 @@ const Compras: React.FC = () => {
         <ActionButton
           label={editId !== null ? 'Actualizar Compra' : 'Registrar Compra'}
           color={editId !== null ? '#ffc107' : '#28a745'}
-          onClick={() => {}}
+          onClick={() =>
+            document
+              .querySelector('form')
+              ?.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }))
+          }
         />
-        <button type="submit" style={{ display: 'none' }} />
       </form>
 
-<table className="table table-hover shadow-sm bg-white rounded">
-          <thead className="table-light">
-            <tr>
-              <th>Producto</th>
-              <th>Proveedor</th>
-              <th>Cantidad</th>
-              <th className="text-center">Acciones</th>
-            </tr>
-          </thead>
-          <tbody>
-            {compras.length > 0 ? (
-              compras.map((compra) => (
-                <tr key={compra.id}>
-                  <td>{obtenerNombreProducto(compra.productoId)}</td>
-                  <td>{obtenerNombreProveedor(compra.proveedorId)}</td>
-                  <td>{compra.cantidad}</td>
-                  <td className="text-center">
-                    <ActionButton label="Editar"  onClick={() => handleEdit(compra)} color="#0d6efd" />
-                    <ActionButton label="Eliminar"  onClick={() => handleDelete(compra.id!)} color="#dc3545" />
-                  </td>
-                </tr>
-              ))
-            ) : (
-              <tr>
-                <td colSpan={4} className="text-center text-muted">
-                  No hay compras registradas.
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
+      <div className="tabla-scroll-container">
+        <TablaDatos
+          datos={compras}
+          columnas={[
+            {
+              key: 'productoId',
+              label: 'Producto',
+              render: (compra) => obtenerNombreProducto(compra.productoId),
+            },
+            {
+              key: 'proveedorId',
+              label: 'Proveedor',
+              render: (compra) => obtenerNombreProveedor(compra.proveedorId),
+            },
+            {
+              key: 'cantidad',
+              label: 'Cantidad',
+            },
+            {
+              key: 'acciones',
+              label: 'Acciones',
+              render: (compra) => (
+                <div className="d-flex justify-content-center gap-1">
+                  <ActionButton
+                    label="Editar"
+                    onClick={() => handleEdit(compra)}
+                    color="#0d6efd"
+                  />
+                  <ActionButton
+                    label="Eliminar"
+                    onClick={() => handleDelete(compra.id!)}
+                    color="#dc3545"
+                  />
+                </div>
+              ),
+            },
+          ]}
+        />
+      </div>
     </div>
   );
 };

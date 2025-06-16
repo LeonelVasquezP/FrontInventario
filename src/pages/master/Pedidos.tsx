@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import ActionButton from '../../components/ComponentesReutilizables/ActionButton';
+import '../../assets/EstadoBadge.css';
 
 interface Producto {
   id: number;
@@ -149,14 +150,15 @@ const Pedidos: React.FC = () => {
         <td>{pedido.cantidad}</td>
         <td>{pedido.fechaPedido}</td>
         <td>
-          <span className={`badge 
-            ${pedido.estado === 'Pendiente' ? 'bg-warning text-dark' : ''}
-            ${pedido.estado === 'Enviado' ? 'bg-info' : ''}
-            ${pedido.estado === 'Recibido' ? 'bg-success' : ''}
-          `}>
-            {pedido.estado}
-          </span>
-        </td>
+        <span className={`badge-pill 
+          ${pedido.estado === 'Pendiente' ? 'estado-pendiente' : ''}
+          ${pedido.estado === 'Enviado' ? 'estado-enviado' : ''}
+          ${pedido.estado === 'Recibido' ? 'estado-recibido' : ''}
+        `}>
+          {pedido.estado}
+        </span>
+      </td>
+
         <td className="text-center">
           <div className="d-flex justify-content-center gap-2">
             <ActionButton
