@@ -2,16 +2,16 @@ import React from 'react';
 import { Bar, Line } from 'react-chartjs-2';
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, PointElement, LineElement, Title, Tooltip, Legend } from 'chart.js';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import CardItem from '../../components/ComponentesReutilizables/CardItem';
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, PointElement, LineElement, Title, Tooltip, Legend);
 
 const Dashboard = () => {
-  // Datos ficticios
   const resumen = [
-    { icon: 'bi-box-seam', label: 'Productos', value: 150 },
-    { icon: 'bi-cart', label: 'Compras', value: 78 },
-    { icon: 'bi-people', label: 'Clientes', value: 94 },
-    { icon: 'bi-truck', label: 'Pedidos', value: 26 },
+    { icon: 'bi-box-seam', label: 'Productos', value: 150, bg: 'bg-productos', path: '/productos' },
+    { icon: 'bi-cart', label: 'Compras', value: 78, bg: 'bg-compras', path: '/compras' },
+    { icon: 'bi-person', label: 'Clientes', value: 94, bg: 'bg-clientes', path: '/clientes' },
+    { icon: 'bi-truck', label: 'Pedidos', value: 26, bg: 'bg-pedidos', path: '/pedidos' },
   ];
 
   const chartCompras = {
@@ -39,19 +39,13 @@ const Dashboard = () => {
 
   return (
     <div className="container mt-4">
-      <h4 className="mb-3 fw-bold"><i className="bi bi-speedometer2 me-2"></i>Dashboard General</h4>
+      <h4 className="mb-3 fw-bold">
+        <i className="bi bi-speedometer2 me-2"></i>Dashboard General
+      </h4>
 
       <div className="row g-4 mb-4">
         {resumen.map((card, idx) => (
-          <div className="col-md-3" key={idx}>
-            <div className="card shadow-sm border-0 text-white bg-primary h-100">
-              <div className="card-body d-flex flex-column align-items-center text-center">
-                <i className={`bi ${card.icon} fs-3 mb-2`}></i>
-                <h5 className="card-title">{card.label}</h5>
-                <p className="fs-4 fw-semibold">{card.value}</p>
-              </div>
-            </div>
-          </div>
+          <CardItem key={idx} {...card} />
         ))}
       </div>
 

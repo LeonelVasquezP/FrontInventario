@@ -1,0 +1,26 @@
+.card-dashboard {
+  transition: transform 0.2s ease-in-out;
+  cursor: pointer;
+  color: white;
+}
+.card-dashboard:hover {
+  transform: scale(1.03);
+}
+.icon {
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+}
+
+/* Colores personalizados */
+.bg-productos {
+  background-color: #0d6efd;
+}
+.bg-compras {
+  background-color: #6610f2;
+}
+.bg-clientes {
+  background-color: #198754;
+}
+.bg-pedidos {
+  background-color: #fd7e14;
+}

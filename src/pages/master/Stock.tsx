@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import ActionButton from '../../components/ComponentesReutilizables/ActionButton';
+import '../../assets/EstadoBadge.css';
 
 interface Stock {
   id?: number;
@@ -120,50 +121,49 @@ const Stocks: React.FC = () => {
       </form>
 
       <div className="table-responsive">
-<table className="table table-hover align-middle shadow-sm border rounded bg-white">
-  <thead className="table-light">
-    <tr>
-      <th>Nombre</th>
-      <th>Descripción</th>
-      <th>Cantidad</th>
-      <th>Mínimo</th>
-      <th>Estado</th>
-      <th className="text-center">Acciones</th>
-    </tr>
-  </thead>
-  <tbody>
-    {stocks.map(stock => (
-      <tr key={stock.id}>
-        <td>{stock.nombre}</td>
-        <td>{stock.descripcion}</td>
-        <td>{stock.cantidad}</td>
-        <td>{stock.minimo}</td>
-        <td>
-          {stock.cantidad < stock.minimo ? (
-            <span className="badge bg-danger">🛑 Abastecer</span>
-          ) : (
-            <span className="badge bg-success">✅ OK</span>
-          )}
-        </td>
-        <td className="text-center">
-          <div className="d-flex justify-content-center gap-2">
-            <ActionButton
-              label="Editar"
-              onClick={() => handleEdit(stock)}
-              color="#0d6efd"
-            />
-            <ActionButton
-              label="Eliminar"
-              onClick={() => handleDelete(stock.id!)}
-              color="#dc3545"
-            />
-          </div>
-        </td>
-      </tr>
-    ))}
-  </tbody>
-</table>
-
+        <table className="table table-hover align-middle shadow-sm border rounded bg-white">
+          <thead className="table-light">
+            <tr>
+              <th>Nombre</th>
+              <th>Descripción</th>
+              <th>Cantidad</th>
+              <th>Mínimo</th>
+              <th>Estado</th>
+              <th className="text-center">Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            {stocks.map(stock => (
+              <tr key={stock.id}>
+                <td>{stock.nombre}</td>
+                <td>{stock.descripcion}</td>
+                <td>{stock.cantidad}</td>
+                <td>{stock.minimo}</td>
+                <td>
+                  {stock.cantidad < stock.minimo ? (
+                    <span className="badge-pill estado-abastecer">🛑 Abastecer</span>
+                  ) : (
+                    <span className="badge-pill estado-ok">✅ OK</span>
+                  )}
+                </td>
+                <td className="text-center">
+                  <div className="d-flex justify-content-center gap-2">
+                    <ActionButton
+                      label="Editar"
+                      onClick={() => handleEdit(stock)}
+                      color="#0d6efd"
+                    />
+                    <ActionButton
+                      label="Eliminar"
+                      onClick={() => handleDelete(stock.id!)}
+                      color="#dc3545"
+                    />
+                  </div>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
 
       <style>{`
@@ -172,6 +172,7 @@ const Stocks: React.FC = () => {
         }
         .table td, .table th {
           vertical-align: middle;
+          text-align: center;
         }
       `}</style>
     </div>
