@@ -19,12 +19,14 @@ import Dashboard from './pages/master/Dashboard';
 import Departamentos from './pages/master/Departamentos';
 import Roles from './pages/master/Roles';
 import Usuarios from './pages/master/Usuarios';
+import Register from './pages/Registro';
 function App() {
 
   return (
     <Router>
       <Routes>
         <Route path="/login" element={<Login />} />
+        <Route path="/registro" element={<Register />} />
         <Route path="/*" element={
           <div style={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>
             <TopNavbar />
