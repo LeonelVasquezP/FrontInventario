@@ -12,7 +12,6 @@ import Compras from './pages/master/Compras';
 import Stock from './pages/master/Stock';
 import Clientes from './pages/master/Clientes';
 import Recibidos from './pages/master/Recibidos';
-import Pedidos from './pages/master/Pedidos';
 import Devoluciones from './pages/master/Devoluciones';
 import AlmacenComponent from './pages/master/Almacenes';
 import Dashboard from './pages/master/Dashboard';
@@ -20,6 +19,9 @@ import Departamentos from './pages/master/Departamentos';
 import Roles from './pages/master/Roles';
 import Usuarios from './pages/master/Usuarios';
 import Register from './pages/Registro';
+import PedidosCrear from './pages/master/PedidosCrear';
+import PedidosVer from './pages/master/PedidosVer';
+
 function App() {
 
   return (
@@ -41,7 +43,8 @@ function App() {
                    <Route path="/stock" element={<Stock />} />
                    <Route path="/clientes" element={<Clientes />} />
                    <Route path="/recibidos" element={<Recibidos />} />
-                   <Route path="/pedidos" element={<Pedidos />} />
+                   <Route path="/PedidosCrear" element={<PedidosCrear />} />
+                   <Route path="/PedidosVer" element={<PedidosVer />} />
                   <Route path="/devoluciones" element={<Devoluciones />} />
                   <Route path="/almacenes" element={<AlmacenComponent />} />
                   <Route path="/dashboard" element={<Dashboard />} />
