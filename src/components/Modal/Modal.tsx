@@ -29,9 +29,12 @@ const Modal: React.FC<ModalProps> = ({ show, title, onClose, children, size = 'l
               <h5 className="modal-title">{title}</h5>
               <button type="button" className="btn-close" onClick={onClose}></button>
             </div>
-            <div className="modal-body">
+
+            {/* Habilita scroll si el contenido es alto */}
+            <div className="modal-body" style={{ maxHeight: '70vh', overflowY: 'auto' }}>
               {children}
             </div>
+
             <div className="modal-footer">
               <button className="btn btn-secondary" onClick={onClose}>Cerrar</button>
             </div>
