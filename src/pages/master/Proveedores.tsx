@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import ActionButton from '../../components/ComponentesReutilizables/ActionButton';
 import '../../assets/EstadoBadge.css';
-import '../../assets/Style.css';
 
 interface Proveedor {
   id?: number;

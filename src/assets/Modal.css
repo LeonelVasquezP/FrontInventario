@@ -1,0 +1,48 @@
+/* Ajustes para selects más estilizados y compactos */
+.form-select {
+  height: 38px;            /* Más compacto que el default */
+  padding: 6px 12px;       /* Padding interno más natural */
+  font-size: 1rem;         /* Tamaño de fuente agradable */
+  border-radius: 8px;      /* Bordes redondeados suaves */
+  border: 1.8px solid #ccc; /* Borde sutil */
+  background-color: #fff;  /* Fondo blanco limpio */
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  box-shadow: inset 0 1px 3px rgb(0 0 0 / 0.1);
+  appearance: none;        /* Quita flecha nativa (puedes poner una flecha personalizada si quieres) */
+  cursor: pointer;
+}
+
+/* Cuando el select está enfocado */
+.form-select:focus {
+  border-color: #0b3d91;
+  box-shadow: 0 0 8px rgba(11, 61, 145, 0.4);
+  outline: none;
+}
+
+/* Ajustes para inputs tipo número para que no se vean tan grandes */
+.form-control[type="number"] {
+  height: 38px;
+  padding: 6px 12px;
+  font-size: 1rem;
+  border-radius: 8px;
+  border: 1.8px solid #ccc;
+  background-color: #fff;
+  box-shadow: inset 0 1px 3px rgb(0 0 0 / 0.1);
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.form-control[type="number"]:focus {
+  border-color: #0b3d91;
+  box-shadow: 0 0 8px rgba(11, 61, 145, 0.4);
+  outline: none;
+}
+
+/* Etiquetas para que tengan un margen y no se peguen a los inputs */
+.form-label {
+  font-weight: 600;
+  margin-bottom: 6px;
+  color: #334155;
+  display: block;
+  font-size: 1rem;
+  letter-spacing: 0.03em;
+}

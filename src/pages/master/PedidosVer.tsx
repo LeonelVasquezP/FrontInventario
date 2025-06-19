@@ -52,105 +52,71 @@ const pedidosFake: Pedido[] = [
   },
 ];
 
-const Pedidos: React.FC = () => {
+const PedidosVer: React.FC = () => {
   const [pedidos, setPedidos] = useState<Pedido[]>([]);
-  const [form, setForm] = useState<Pedido>({
-    productoId: 0,
-    proveedorId: 0,
-    cantidad: 0,
-    estado: "Pendiente",
-  });
   const [editId, setEditId] = useState<number | null>(null);
   const [showModal, setShowModal] = useState(false);
-
-  // Estados para filtros
+  const [form, setForm] = useState<Pedido>({
+    productoId: productosFake[0]?.id || 0,
+    proveedorId: proveedoresFake[0]?.id || 0,
+    cantidad: 1,
+    estado: "Pendiente",
+  });
   const [filtroProveedor, setFiltroProveedor] = useState<number>(0);
   const [filtroFecha, setFiltroFecha] = useState<Date | null>(null);
 
   useEffect(() => {
-    setTimeout(() => {
-      setPedidos(pedidosFake);
-    }, 500);
+    setPedidos(pedidosFake);
   }, []);
 
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
-  ) => {
-    const { name, value } = e.target;
-    setForm({
-      ...form,
-      [name]: name === "cantidad" ? Number(value) : value,
-    });
-  };
+  const obtenerNombreProducto = (id: number) => productosFake.find(p => p.id === id)?.nombre || 'Desconocido';
+  const obtenerNombreProveedor = (id: number) => proveedoresFake.find(p => p.id === id)?.nombre || 'Desconocido';
 
-  const openAddModal = () => {
-    setForm({ productoId: 0, proveedorId: 0, cantidad: 0, estado: "Pendiente" });
-    setEditId(null);
-    setShowModal(true);
-  };
-
-  const openEditModal = (pedido: Pedido) => {
-    setForm(pedido);
-    setEditId(pedido.id || null);
-    setShowModal(true);
-  };
-
-  const handleSubmit = () => {
-    if (form.productoId === 0 || form.proveedorId === 0 || form.cantidad <= 0)
-      return;
-
-    if (editId !== null) {
-      setPedidos((prev) =>
-        prev.map((p) => (p.id === editId ? { ...form, id: editId } : p))
-      );
-    } else {
-      const newId =
-        pedidos.length > 0 ? Math.max(...pedidos.map((p) => p.id || 0)) + 1 : 1;
-      setPedidos([
-        ...pedidos,
-        { ...form, id: newId, fechaPedido: new Date().toISOString().split("T")[0] },
-      ]);
-    }
-
-    setShowModal(false);
-    setForm({ productoId: 0, proveedorId: 0, cantidad: 0, estado: "Pendiente" });
-    setEditId(null);
-  };
-
-  const handleDelete = (id: number) => {
-    if (!window.confirm("¿Eliminar este pedido?")) return;
-    setPedidos((prev) => prev.filter((p) => p.id !== id));
-  };
-
-  const obtenerNombreProducto = (id: number) =>
-    productosFake.find((p) => p.id === id)?.nombre || "Desconocido";
-  const obtenerNombreProveedor = (id: number) =>
-    proveedoresFake.find((p) => p.id === id)?.nombre || "Desconocido";
-
-  // Filtrar pedidos según filtros
   const pedidosFiltrados = pedidos.filter((pedido) => {
-    // Filtrar por proveedor
     if (filtroProveedor !== 0 && pedido.proveedorId !== filtroProveedor) return false;
-
-    // Filtrar por fecha (solo día/mes/año)
     if (filtroFecha) {
-      if (!pedido.fechaPedido) return false;
-      const pedidoDate = new Date(pedido.fechaPedido);
+      const pedidoDate = new Date(pedido.fechaPedido!);
       if (
         pedidoDate.getFullYear() !== filtroFecha.getFullYear() ||
         pedidoDate.getMonth() !== filtroFecha.getMonth() ||
         pedidoDate.getDate() !== filtroFecha.getDate()
-      )
-        return false;
+      ) return false;
     }
-
     return true;
   });
+
+  const handleDelete = (id: number) => {
+    if (!window.confirm("¿Eliminar este pedido?")) return;
+    setPedidos(prev => prev.filter(p => p.id !== id));
+  };
+
+  const handleEdit = (pedido: Pedido) => {
+    setEditId(pedido.id || null);
+    setForm({
+      productoId: pedido.productoId || productosFake[0]?.id || 0,
+      proveedorId: pedido.proveedorId || proveedoresFake[0]?.id || 0,
+      cantidad: pedido.cantidad || 1,
+      estado: pedido.estado || "Pendiente",
+    });
+    setShowModal(true);
+  };
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const { name, value } = e.target;
+    setForm({ ...form, [name]: name === 'cantidad' ? Number(value) : value });
+  };
+
+  const handleSubmit = () => {
+    if (editId !== null) {
+      setPedidos(prev => prev.map(p => (p.id === editId ? { ...form, id: editId } : p)));
+      setShowModal(false);
+    }
+  };
 
   return (
     <div className="container mt-5 pt-4">
       <h3 className="fw-bold mb-4">
-        <i className="bi bi-box-seam me-2"></i>Gestión de Pedidos
+        <i className="bi bi-truck me-2"></i>Ver Pedidos
       </h3>
 
       {/* FILTROS */}
@@ -196,10 +162,6 @@ const Pedidos: React.FC = () => {
           >
             Limpiar filtros
           </button>
-
-          <button className="btn btn-primary" onClick={openAddModal}>
-            <i className="bi bi-plus-lg me-1"></i> Agregar Pedido
-          </button>
         </div>
       </div>
 
@@ -225,22 +187,10 @@ const Pedidos: React.FC = () => {
               <td>
                 <span
                   className={`badge-pill 
-                  ${
-                    pedido.estado === "Pendiente"
-                      ? "estado-pendiente"
-                      : ""
-                  }
-                  ${
-                    pedido.estado === "Enviado"
-                      ? "estado-enviado"
-                      : ""
-                  }
-                  ${
-                    pedido.estado === "Recibido"
-                      ? "estado-recibido"
-                      : ""
-                  }
-                `}
+                    ${pedido.estado === "Pendiente" ? "estado-pendiente" : ""}
+                    ${pedido.estado === "Enviado" ? "estado-enviado" : ""}
+                    ${pedido.estado === "Recibido" ? "estado-recibido" : ""}
+                  `}
                 >
                   {pedido.estado}
                 </span>
@@ -250,7 +200,7 @@ const Pedidos: React.FC = () => {
                   <button
                     style={{ marginRight: "10px" }}
                     className="btn btn-outline-primary btn-sm px-3"
-                    onClick={() => openEditModal(pedido)}
+                    onClick={() => handleEdit(pedido)}
                   >
                     <i className="bi bi-pencil me-1"></i>Editar
                   </button>
@@ -274,29 +224,14 @@ const Pedidos: React.FC = () => {
         </tbody>
       </table>
 
-      {/* Botón flotante agregar */}
-      <button
-        className="btn btn-primary rounded-circle position-fixed shadow"
-        style={{ right: "30px", bottom: "30px", width: "56px", height: "56px", zIndex: 1050 }}
-        onClick={openAddModal}
-      >
-        <i className="bi bi-plus-lg fs-4 text-white"></i>
-      </button>
-
-      {/* Modal de formulario */}
+      {/* Modal de formulario con tamaño xl para más ancho y scroll */}
       <Modal
         show={showModal}
         onClose={() => setShowModal(false)}
-        title={editId !== null ? "Editar Pedido" : "Agregar Pedido"}
-        size="lg"
+        title="Editar Pedido"
+        size="xl"
       >
-        {/* No se toca el contenido del modal, es el mismo que tienes */}
-        <form
-          onSubmit={(e) => {
-            e.preventDefault();
-            handleSubmit();
-          }}
-        >
+        <form onSubmit={(e) => { e.preventDefault(); handleSubmit(); }}>
           <div className="row g-3">
             <div className="col-12">
               <label htmlFor="productoId" className="form-label fw-semibold">
@@ -378,15 +313,7 @@ const Pedidos: React.FC = () => {
 
           <div className="mt-4 text-end">
             <button type="submit" className="btn btn-success px-4">
-              {editId !== null ? (
-                <>
-                  <i className="bi bi-pencil-square me-2"></i>Actualizar
-                </>
-              ) : (
-                <>
-                  <i className="bi bi-plus-lg me-2"></i>Agregar
-                </>
-              )}
+              <i className="bi bi-pencil-square me-2"></i>Actualizar
             </button>
           </div>
         </form>
@@ -395,4 +322,4 @@ const Pedidos: React.FC = () => {
   );
 };
 
-export default Pedidos;
+export default PedidosVer;

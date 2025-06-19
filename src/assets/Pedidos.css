@@ -1,0 +1,80 @@
+/* Fondo y contenedor principal */
+.container {
+  max-width: 600px;
+  background: #fff;
+  padding: 2.5rem 2rem 3rem 2rem;
+  border-radius: 12px;
+  box-shadow: 0 12px 25px rgba(0, 0, 0, 0.1);
+  margin-top: 3rem;
+  margin-bottom: 3rem;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Título */
+h3.fw-bold {
+  font-size: 1.9rem;
+  color: #343a40;
+  margin-bottom: 1.8rem;
+  letter-spacing: 1.2px;
+}
+
+/* Labels */
+.form-label {
+  font-weight: 600;
+  color: #495057;
+  font-size: 1rem;
+}
+
+/* Inputs y selects */
+.form-control,
+.form-select {
+  border: 2px solid #ced4da;
+  border-radius: 8px;
+  padding: 0.55rem 1rem;
+  font-size: 1rem;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.form-control:focus,
+.form-select:focus {
+  border-color: #6610f2; /* morado intenso */
+  box-shadow: 0 0 8px rgba(102, 16, 242, 0.4);
+  outline: none;
+}
+
+/* Botón */
+.btn-success {
+  background: linear-gradient(135deg, #6f42c1, #9f7aea);
+  border: none;
+  border-radius: 30px;
+  font-weight: 700;
+  font-size: 1.1rem;
+  padding: 0.6rem 2rem;
+  box-shadow: 0 5px 15px rgba(111, 66, 193, 0.4);
+  transition: all 0.3s ease;
+}
+
+.btn-success:hover {
+  background: linear-gradient(135deg, #5a32a3, #7d4cd4);
+  box-shadow: 0 8px 20px rgba(111, 66, 193, 0.7);
+  transform: translateY(-2px);
+}
+
+/* Ícono dentro del botón */
+.btn-success i {
+  vertical-align: middle;
+  font-size: 1.2rem;
+}
+
+/* Espaciado general */
+.row.g-3 > [class^="col-"] {
+  margin-bottom: 1.25rem;
+}
+
+/* Responsive: que el formulario se centre */
+@media (max-width: 768px) {
+  .container {
+    margin: 2rem 1rem;
+    padding: 2rem 1.5rem;
+  }
+}

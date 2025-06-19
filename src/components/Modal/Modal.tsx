@@ -1,6 +1,7 @@
 // src/components/ControlesFormulario/Modal.tsx
 import React from 'react';
 import ReactDOM from 'react-dom';
+import "../../assets/Modal.css";
 
 interface ModalProps {
   show: boolean;
