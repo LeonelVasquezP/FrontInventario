@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import ActionButton from '../../components/ComponentesReutilizables/ActionButton';
 import '../../assets/EstadoBadge.css';
+import Modal from '../../components/Modal/Modal';
 
 interface Stock {
   id?: number;
@@ -18,107 +19,93 @@ const mockStocks: Stock[] = [
 
 const Stocks: React.FC = () => {
   const [stocks, setStocks] = useState<Stock[]>([]);
-  const [form, setForm] = useState<Stock>({
-    nombre: '',
-    descripcion: '',
-    cantidad: 0,
-    minimo: 0,
-  });
-  const [editId, setEditId] = useState<number | null>(null);
+  const [editStock, setEditStock] = useState<Stock | null>(null);
+  const [showModal, setShowModal] = useState(false);
+  const [busqueda, setBusqueda] = useState<string>('');
+  const [filtroEstado, setFiltroEstado] = useState<string>('todos');
 
   useEffect(() => {
-    setTimeout(() => setStocks(mockStocks), 300);
+    setStocks(mockStocks);
   }, []);
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setForm({
-      ...form,
-      [e.target.name]: ['cantidad', 'minimo'].includes(e.target.name)
-        ? Number(e.target.value)
-        : e.target.value,
-    });
-  };
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (editId !== null) {
-      setStocks(stocks.map(p => (p.id === editId ? { ...form, id: editId } : p)));
-    } else {
-      const newId = stocks.length > 0 ? Math.max(...stocks.map(p => p.id || 0)) + 1 : 1;
-      setStocks([...stocks, { ...form, id: newId }]);
-    }
-    setForm({ nombre: '', descripcion: '', cantidad: 0, minimo: 0 });
-    setEditId(null);
-  };
-
-  const handleEdit = (prod: Stock) => {
-    setForm(prod);
-    setEditId(prod.id || null);
-  };
 
   const handleDelete = (id: number) => {
     if (!window.confirm('¿Eliminar este stock?')) return;
     setStocks(stocks.filter(p => p.id !== id));
   };
 
+  const abrirModalEdicion = (stock: Stock) => {
+    setEditStock(stock);
+    setShowModal(true);
+  };
+
+  const actualizarCampo = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!editStock) return;
+    const { name, value } = e.target;
+    setEditStock({
+      ...editStock,
+      [name]: ['cantidad', 'minimo'].includes(name) ? Number(value) : value,
+    });
+  };
+
+  const guardarCambios = () => {
+    if (!editStock) return;
+    setStocks(prev => prev.map(s => (s.id === editStock.id ? editStock : s)));
+    setShowModal(false);
+  };
+
+  const stocksFiltrados = stocks.filter(s => {
+    const coincideBusqueda =
+      s.nombre.toLowerCase().includes(busqueda.toLowerCase()) ||
+      s.descripcion.toLowerCase().includes(busqueda.toLowerCase());
+
+    const coincideEstado =
+      filtroEstado === 'todos' ||
+      (filtroEstado === 'ok' && s.cantidad >= s.minimo) ||
+      (filtroEstado === 'bajo' && s.cantidad < s.minimo);
+
+    return coincideBusqueda && coincideEstado;
+  });
+
   return (
     <div className="stocks-wrapper p-3">
       <h2 className="mb-4">Gestión de Stocks</h2>
 
-      <form onSubmit={handleSubmit} className="stock-form card p-4 mb-4 shadow-sm">
-        <div className="row">
-          <div className="col-md-3 mb-3">
-            <input
-              name="nombre"
-              value={form.nombre}
-              onChange={handleChange}
-              placeholder="Nombre del producto"
-              className="form-control"
-              required
-            />
-          </div>
-          <div className="col-md-3 mb-3">
-            <input
-              name="descripcion"
-              value={form.descripcion}
-              onChange={handleChange}
-              placeholder="Descripción"
-              className="form-control"
-              required
-            />
-          </div>
-          <div className="col-md-2 mb-3">
-            <input
-              name="cantidad"
-              type="number"
-              value={form.cantidad}
-              onChange={handleChange}
-              placeholder="Cantidad"
-              className="form-control"
-              required
-            />
-          </div>
-          <div className="col-md-2 mb-3">
-            <input
-              name="minimo"
-              type="number"
-              value={form.minimo}
-              onChange={handleChange}
-              placeholder="Stock Mínimo"
-              className="form-control"
-              required
-            />
-          </div>
-          <div className="col-md-2 d-grid mb-3">
-            <ActionButton
-              label={editId !== null ? 'Actualizar' : 'Agregar'}
-              color={editId !== null ? '#ffc107' : '#28a745'}
-              onClick={() => {}}
-            />
-          </div>
+      {/* Filtros */}
+      <div className="row mb-3 g-3 align-items-end">
+        <div className="col-md-6">
+          <input
+            type="text"
+            className="form-control"
+            placeholder="Buscar por nombre o descripción..."
+            value={busqueda}
+            onChange={e => setBusqueda(e.target.value)}
+          />
         </div>
-        <button type="submit" style={{ display: 'none' }} />
-      </form>
+
+        <div className="col-md-3">
+          <select
+            className="form-select"
+            value={filtroEstado}
+            onChange={e => setFiltroEstado(e.target.value)}
+          >
+            <option value="todos">Todos los estados</option>
+            <option value="ok">OK</option>
+            <option value="bajo">Abastecer</option>
+          </select>
+        </div>
+
+        <div className="col-md-3">
+          <button
+            className="btn btn-secondary w-100"
+            onClick={() => {
+              setBusqueda('');
+              setFiltroEstado('todos');
+            }}
+          >
+            Limpiar filtros
+          </button>
+        </div>
+      </div>
 
       <div className="table-responsive">
         <table className="table table-hover align-middle shadow-sm border rounded bg-white">
@@ -133,7 +120,7 @@ const Stocks: React.FC = () => {
             </tr>
           </thead>
           <tbody>
-            {stocks.map(stock => (
+            {stocksFiltrados.map(stock => (
               <tr key={stock.id}>
                 <td>{stock.nombre}</td>
                 <td>{stock.descripcion}</td>
@@ -148,16 +135,22 @@ const Stocks: React.FC = () => {
                 </td>
                 <td className="text-center">
                   <div className="d-flex justify-content-center gap-2">
-                    <ActionButton
-                      label="Editar"
-                      onClick={() => handleEdit(stock)}
-                      color="#0d6efd"
-                    />
-                    <ActionButton
-                      label="Eliminar"
+                    <button
+                      className="btn btn-sm btn-primary"
+                      onClick={() => abrirModalEdicion(stock)}
+                      title="Editar"
+                      style={{ minWidth: "70px", marginRight: "10px" }}
+                    >
+                      <i className="bi bi-pencil-fill me-1"></i>Editar
+                    </button>
+                    <button
+                      className="btn btn-sm btn-danger"
                       onClick={() => handleDelete(stock.id!)}
-                      color="#dc3545"
-                    />
+                      title="Eliminar"
+                      style={{ minWidth: "70px" }}
+                    >
+                      <i className="bi bi-trash-fill me-1"></i>Eliminar
+                    </button>
                   </div>
                 </td>
               </tr>
@@ -165,6 +158,65 @@ const Stocks: React.FC = () => {
           </tbody>
         </table>
       </div>
+
+      {/* Modal de edición */}
+      <Modal show={showModal} onClose={() => setShowModal(false)} title="Editar Stock">
+        {editStock && (
+          <div className="container-fluid">
+            <div className="row mb-3">
+              <div className="col-md-6">
+                <label className="form-label">Nombre</label>
+                <input
+                  type="text"
+                  className="form-control"
+                  name="nombre"
+                  value={editStock.nombre}
+                  onChange={actualizarCampo}
+                />
+              </div>
+              <div className="col-md-6">
+                <label className="form-label">Descripción</label>
+                <input
+                  type="text"
+                  className="form-control"
+                  name="descripcion"
+                  value={editStock.descripcion}
+                  onChange={actualizarCampo}
+                />
+              </div>
+            </div>
+
+            <div className="row mb-3">
+              <div className="col-md-6">
+                <label className="form-label">Cantidad</label>
+                <input
+                  type="number"
+                  className="form-control"
+                  name="cantidad"
+                  value={editStock.cantidad}
+                  onChange={actualizarCampo}
+                />
+              </div>
+              <div className="col-md-6">
+                <label className="form-label">Mínimo</label>
+                <input
+                  type="number"
+                  className="form-control"
+                  name="minimo"
+                  value={editStock.minimo}
+                  onChange={actualizarCampo}
+                />
+              </div>
+            </div>
+
+            <div className="text-end">
+              <button className="btn btn-success px-4" onClick={guardarCambios}>
+                Guardar Cambios
+              </button>
+            </div>
+          </div>
+        )}
+      </Modal>
 
       <style>{`
         .stocks-wrapper h2 {
