@@ -7,8 +7,10 @@ import Footer from './components/ComponentesReutilizables/Footer';
 import Login from './pages/Login';
 import Home from './pages/Home';
 import Productos from './pages/master/Productos';
-import Proveedores from './pages/master/Proveedores';
-import Compras from './pages/master/Compras';
+import ProveedoresCrear from './pages/master/ProveedoresCrear';
+import ProveedoresVer from './pages/master/ProveedoresVer';
+import CrearCompra from './pages/master/CrearCompra';
+import VerCompras from './pages/master/VerCompras';
 import Stock from './pages/master/Stock';
 import Clientes from './pages/master/Clientes';
 import Recibidos from './pages/master/Recibidos';
@@ -38,13 +40,15 @@ function App() {
                 <Routes>
                   <Route path="/" element={<Navigate to="/home" />} />
                   <Route path="/productos" element={<Productos />} />
-                  <Route path="/proveedores" element={<Proveedores />} />
-                  <Route path="/compras" element={<Compras />} />
+                  <Route path="/CrearCompra" element={<CrearCompra />} />
+                  <Route path="/VerCompras" element={<VerCompras />} />
                    <Route path="/stock" element={<Stock />} />
                    <Route path="/clientes" element={<Clientes />} />
                    <Route path="/recibidos" element={<Recibidos />} />
                    <Route path="/PedidosCrear" element={<PedidosCrear />} />
                    <Route path="/PedidosVer" element={<PedidosVer />} />
+                    <Route path="/ProveedoresCrear" element={<ProveedoresCrear />} />
+                   <Route path="/ProveedoresVer" element={<ProveedoresVer />} />
                   <Route path="/devoluciones" element={<Devoluciones />} />
                   <Route path="/almacenes" element={<AlmacenComponent />} />
                   <Route path="/dashboard" element={<Dashboard />} />
