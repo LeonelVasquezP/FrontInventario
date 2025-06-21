@@ -1,111 +1,265 @@
-import React, { useEffect, useState } from 'react';
-import ActionButton from '../../components/ComponentesReutilizables/ActionButton';
-import '../../assets/EstadoBadge.css';
+import React, { useEffect, useState } from "react";
+import Modal from "../../components/Modal/Modal";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+import SearchableSelect from "../../components/ComponentesReutilizables/SearchableSelect";
 
 interface Producto {
-  id?: number;
+  id: number;
+  codigo: string;
   nombre: string;
-  descripcion: string;
+  unidad: string;
+  fechaIngreso: string;
   cantidad: number;
   precio: number;
-  codigo: string;
-  unidad: string;
-  ubicacion: string;
-  fechaIngreso: string;
-  proveedor: string;
 }
 
 const productosFake: Producto[] = [
   {
     id: 1,
-    nombre: 'Producto A',
-    descripcion: 'Descripción A',
+    codigo: "A001",
+    nombre: "Producto A",
+    unidad: "Unidad",
+    fechaIngreso: "2025-06-10",
     cantidad: 10,
     precio: 25.5,
-    codigo: 'A001',
-    unidad: 'unidad',
-    ubicacion: 'Estante 1',
-    fechaIngreso: '2025-06-10',
-    proveedor: 'Proveedor A'
   },
   {
     id: 2,
-    nombre: 'Producto B',
-    descripcion: 'Descripción B',
+    codigo: "B002",
+    nombre: "Producto B",
+    unidad: "Caja",
+    fechaIngreso: "2025-06-12",
     cantidad: 5,
     precio: 12.0,
-    codigo: 'B002',
-    unidad: 'caja',
-    ubicacion: 'Bodega',
-    fechaIngreso: '2025-06-12',
-    proveedor: 'Proveedor B'
-  }
+  },
 ];
 
 const VerProductos: React.FC = () => {
   const [productos, setProductos] = useState<Producto[]>([]);
+  const [filtroUnidad, setFiltroUnidad] = useState<string | null>(null);
+  const [fechaInicio, setFechaInicio] = useState<Date | null>(null);
+  const [fechaFin, setFechaFin] = useState<Date | null>(null);
+  const [editProducto, setEditProducto] = useState<Producto | null>(null);
+  const [showModal, setShowModal] = useState(false);
 
   useEffect(() => {
-    setTimeout(() => setProductos(productosFake), 500);
+    setProductos(productosFake);
   }, []);
 
-  const handleDelete = (id: number) => {
-    if (!window.confirm('¿Estás seguro de eliminar este producto?')) return;
-    setProductos(prev => prev.filter(p => p.id !== id));
+  const productosFiltrados = productos.filter((p) => {
+    if (filtroUnidad && p.unidad !== filtroUnidad) return false;
+    const fecha = new Date(p.fechaIngreso);
+    if (fechaInicio && fecha < fechaInicio) return false;
+    if (fechaFin && fecha > fechaFin) return false;
+    return true;
+  });
+
+  const eliminarProducto = (id: number) => {
+    if (!window.confirm("¿Seguro que quieres eliminar este producto?")) return;
+    setProductos((prev) => prev.filter((p) => p.id !== id));
+  };
+
+  const abrirModalEdicion = (producto: Producto) => {
+    setEditProducto(producto);
+    setShowModal(true);
+  };
+
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
+  ) => {
+    if (!editProducto) return;
+    const { name, value } = e.target;
+    setEditProducto({ ...editProducto, [name]: name === "cantidad" || name === "precio" ? Number(value) : value });
+  };
+
+  const guardarCambios = () => {
+    if (!editProducto) return;
+    setProductos((prev) =>
+      prev.map((p) => (p.id === editProducto.id ? editProducto : p))
+    );
+    setShowModal(false);
   };
 
   return (
-    <div>
-      <h2 className="mb-3">Listado de Productos</h2>
+    <div className="container mt-4">
+      <h4 className="mb-3">Lista de Productos</h4>
 
-      <table className="table table-hover align-middle shadow-sm border rounded bg-white">
-        <thead className="table-light">
-          <tr>
-            <th>Nombre</th>
-            <th>Descripción</th>
-            <th>Código</th>
-            <th>Unidad</th>
-            <th>Ubicación</th>
-            <th>Ingreso</th>
-            <th>Proveedor</th>
-            <th>Cantidad</th>
-            <th>Precio</th>
-            <th>Estado</th>
-            <th className="text-center">Acciones</th>
-          </tr>
-        </thead>
-        <tbody>
-          {productos.map(prod => (
-            <tr key={prod.id}>
-              <td>{prod.nombre}</td>
-              <td>{prod.descripcion}</td>
-              <td>{prod.codigo}</td>
-              <td>{prod.unidad}</td>
-              <td>{prod.ubicacion}</td>
-              <td>{prod.fechaIngreso}</td>
-              <td>{prod.proveedor}</td>
-              <td>{prod.cantidad}</td>
-              <td>${prod.precio.toFixed(2)}</td>
-              <td>
-                {prod.cantidad <= 5 ? (
-                  <span className="estado-badge abastecer">
-                    <span className="circle"></span> Abastecer
-                  </span>
-                ) : (
-                  <span className="estado-badge ok">
-                    <span className="circle"></span> OK
-                  </span>
-                )}
-              </td>
-              <td className="text-center">
-                <div className="d-flex justify-content-center gap-2">
-                  <ActionButton label="Eliminar" onClick={() => handleDelete(prod.id!)} color="#dc3545" />
-                </div>
-              </td>
+      <div className="row mb-4 g-3 align-items-end">
+        <div className="col-md-4">
+          <SearchableSelect
+            options={[
+              { id: "Unidad", label: "Unidad" },
+              { id: "Caja", label: "Caja" },
+            ]}
+            value={filtroUnidad}
+            onChange={(val) => setFiltroUnidad(typeof val === "string" ? val : null)}
+            placeholder="Filtrar por unidad"
+            label="Unidad"
+          />
+        </div>
+
+        <div className="col-md-3">
+          <label className="form-label">Fecha inicio</label>
+          <DatePicker
+            selected={fechaInicio}
+            onChange={(date) => setFechaInicio(date)}
+            className="form-control"
+            dateFormat="yyyy-MM-dd"
+            placeholderText="Fecha inicio"
+            isClearable
+          />
+        </div>
+
+        <div className="col-md-3">
+          <label className="form-label">Fecha fin</label>
+          <DatePicker
+            selected={fechaFin}
+            onChange={(date) => setFechaFin(date)}
+            className="form-control"
+            dateFormat="yyyy-MM-dd"
+            placeholderText="Fecha fin"
+            isClearable
+          />
+        </div>
+
+        <div className="col-md-2 d-grid">
+          <button
+            className="btn btn-secondary"
+            onClick={() => {
+              setFiltroUnidad(null);
+              setFechaInicio(null);
+              setFechaFin(null);
+            }}
+          >
+            Limpiar filtros
+          </button>
+        </div>
+      </div>
+
+      <div className="table-responsive">
+        <table className="table table-bordered table-hover align-middle">
+          <thead className="table-light">
+            <tr>
+              <th>Código</th>
+              <th>Nombre</th>
+              <th>Unidad</th>
+              <th>Cantidad</th>
+              <th>Precio</th>
+              <th>Acciones</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {productosFiltrados.length === 0 ? (
+              <tr>
+                <td colSpan={6} className="text-center">
+                  No hay productos que coincidan con los filtros.
+                </td>
+              </tr>
+            ) : (
+              productosFiltrados.map((p) => (
+                <tr key={p.id}>
+                  <td>{p.codigo}</td>
+                  <td>{p.nombre}</td>
+                  <td>{p.unidad}</td>
+                  <td>{p.cantidad}</td>
+                  <td>L. {p.precio.toFixed(2)}</td>
+                  <td>
+                    <div>
+                      <button
+                        className="btn btn-sm btn-primary"
+                        onClick={() => abrirModalEdicion(p)}
+                        title="Editar producto"
+                        style={{ minWidth: "70px", marginRight: "10px" }}
+                      >
+                        <i className="bi bi-pencil-fill me-1"></i>Editar
+                      </button>
+                      <button
+                        className="btn btn-sm btn-danger"
+                        onClick={() => eliminarProducto(p.id)}
+                        title="Eliminar producto"
+                        style={{ minWidth: "70px" }}
+                      >
+                        <i className="bi bi-trash-fill me-1"></i>Eliminar
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))
+            )}
+          </tbody>
+        </table>
+      </div>
+
+      <Modal show={showModal} onClose={() => setShowModal(false)} title="Editar Producto" size="xl">
+        {editProducto && (
+          <div className="container-fluid">
+            <div className="row mb-3">
+              <div className="col-md-3">
+                <label className="form-label">Código</label>
+                <input
+                  type="text"
+                  name="codigo"
+                  className="form-control"
+                  value={editProducto.codigo}
+                  onChange={handleChange}
+                  placeholder="Código"
+                />
+              </div>
+              <div className="col-md-6">
+                <label className="form-label">Nombre</label>
+                <input
+                  type="text"
+                  name="nombre"
+                  className="form-control"
+                  value={editProducto.nombre}
+                  onChange={handleChange}
+                  placeholder="Nombre del producto"
+                />
+              </div>
+              <div className="col-md-3">
+                <label className="form-label">Unidad</label>
+                <input
+                  name="unidad"
+                  className="form-control"
+                  value={editProducto.unidad}
+                  onChange={handleChange}
+                  placeholder="Unidad"
+                />
+              </div>
+            </div>
+
+            <div className="row mb-3">
+              <div className="col-md-6">
+                <label className="form-label">Cantidad</label>
+                <input
+                  name="cantidad"
+                  type="number"
+                  className="form-control"
+                  value={editProducto.cantidad}
+                  onChange={handleChange}
+                />
+              </div>
+              <div className="col-md-6">
+                <label className="form-label">Precio</label>
+                <input
+                  name="precio"
+                  type="number"
+                  className="form-control"
+                  value={editProducto.precio}
+                  onChange={handleChange}
+                />
+              </div>
+            </div>
+
+            <div className="text-end mt-4">
+              <button className="btn btn-success px-4" onClick={guardarCambios}>
+                Guardar Cambios
+              </button>
+            </div>
+          </div>
+        )}
+      </Modal>
     </div>
   );
 };

@@ -250,7 +250,7 @@ const VerDevoluciones: React.FC = () => {
                 <tr>
                   <th>Producto</th>
                   <th>Precio</th>
-                  <th>Cantidad</th>
+                  <th>Cantidad</th> 
                   <th>Subtotal</th>
                   <th>Acción</th>
                 </tr>

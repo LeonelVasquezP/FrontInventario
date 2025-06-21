@@ -1,9 +1,8 @@
 
 import React, { useEffect, useState } from "react";
-import Modal from "../../components/Modal/Modal"; // Asegúrate de tener este componente Modal
+import Modal from "../../components/Modal/Modal";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import SearchableSelect from "../../components/ComponentesReutilizables/SearchableSelect";
 
 interface Proveedor {
   id: number;
@@ -56,7 +55,7 @@ const proveedoresFake: Proveedor[] = [
 
 const ProveedoresVer: React.FC = () => {
   const [proveedores, setProveedores] = useState<Proveedor[]>([]);
-  const [filtroTipo, setFiltroTipo] = useState<string | null>(null);
+  const [filtroNombre, setFiltroNombre] = useState<string>("");
   const [fechaInicio, setFechaInicio] = useState<Date | null>(null);
   const [fechaFin, setFechaFin] = useState<Date | null>(null);
   const [editProveedor, setEditProveedor] = useState<Proveedor | null>(null);
@@ -66,14 +65,11 @@ const ProveedoresVer: React.FC = () => {
     setProveedores(proveedoresFake);
   }, []);
 
-  // Filtrado sencillo
   const proveedoresFiltrados = proveedores.filter((p) => {
-    if (filtroTipo && p.tipo !== filtroTipo) return false;
-
+    if (filtroNombre && !p.nombre.toLowerCase().includes(filtroNombre.toLowerCase())) return false;
     const fecha = new Date(p.fechaRegistro);
     if (fechaInicio && fecha < fechaInicio) return false;
     if (fechaFin && fecha > fechaFin) return false;
-
     return true;
   });
 
@@ -82,13 +78,11 @@ const ProveedoresVer: React.FC = () => {
     setProveedores((prev) => prev.filter((p) => p.id !== id));
   };
 
-  // Abre modal y carga el proveedor seleccionado
   const abrirModalEdicion = (proveedor: Proveedor) => {
     setEditProveedor(proveedor);
     setShowModal(true);
   };
 
-  // Actualiza los campos en el modal
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
   ) => {
@@ -97,17 +91,6 @@ const ProveedoresVer: React.FC = () => {
     setEditProveedor({ ...editProveedor, [name]: value });
   };
 
-  // Actualiza fecha de registro
-  const handleFechaRegistroChange = (date: Date | null) => {
-    if (!editProveedor) return;
-    if (date) {
-      setEditProveedor({ ...editProveedor, fechaRegistro: date.toISOString().split("T")[0] });
-    } else {
-      setEditProveedor({ ...editProveedor, fechaRegistro: "" });
-    }
-  };
-
-  // Guarda cambios en el proveedor
   const guardarCambios = () => {
     if (!editProveedor) return;
     setProveedores((prev) =>
@@ -120,19 +103,21 @@ const ProveedoresVer: React.FC = () => {
     <div className="container mt-4">
       <h4 className="mb-3">Lista de Proveedores</h4>
 
-      {/* Filtros */}
       <div className="row mb-4 g-3 align-items-end">
         <div className="col-md-4">
-          <SearchableSelect
-            options={[
-              { id: "Nacional", label: "Nacional" },
-              { id: "Internacional", label: "Internacional" },
-            ]}
-            value={filtroTipo}
-            onChange={(val) => setFiltroTipo(typeof val === "string" ? val : null)}
-            placeholder="Filtrar por tipo"
-            label="Tipo"
+          <label className="form-label">Buscar por nombre</label>
+          <input
+            list="nombresProveedores"
+            className="form-control"
+            placeholder="Nombre del proveedor"
+            value={filtroNombre}
+            onChange={(e) => setFiltroNombre(e.target.value)}
           />
+          <datalist id="nombresProveedores">
+            {proveedores.map((p) => (
+              <option key={p.id} value={p.nombre} />
+            ))}
+          </datalist>
         </div>
 
         <div className="col-md-3">
@@ -163,7 +148,7 @@ const ProveedoresVer: React.FC = () => {
           <button
             className="btn btn-secondary"
             onClick={() => {
-              setFiltroTipo(null);
+              setFiltroNombre("");
               setFechaInicio(null);
               setFechaFin(null);
             }}
@@ -173,9 +158,8 @@ const ProveedoresVer: React.FC = () => {
         </div>
       </div>
 
-      {/* Tabla */}
       <div className="table-responsive">
-        <table className="table table-bordered table-hover align-middle">
+        <table className="table table-bordered table-hover">
           <thead className="table-light">
             <tr>
               <th>Código</th>
@@ -202,32 +186,32 @@ const ProveedoresVer: React.FC = () => {
                   <td>{p.estado}</td>
                   <td>{p.fechaRegistro}</td>
                   <td>
-                <div>
+                    <div>
                 <button
-                    className="btn btn-sm btn-primary"
-                    onClick={() => abrirModalEdicion(p)}
-                    title="Editar pedido"
-                    style={{ minWidth: "70px", marginRight: "10px" }}
+                  className="btn btn-sm btn-primary"
+                  onClick={() => abrirModalEdicion(p)}
+                  title="Editar pedido"
+                  style={{ minWidth: "70px", marginRight: "10px" }}
                 >
-                    <i className="bi bi-pencil-fill me-1"></i>Editar
+                  <i className="bi bi-pencil-fill me-1"></i>Editar
                 </button>
                 <button
-                    className="btn btn-sm btn-danger"
-                    onClick={() => eliminarProveedor(p.id)}
-                    title="Eliminar pedido"
-                    style={{ minWidth: "70px", marginRight: "10px" }}
+                  className="btn btn-sm btn-danger"
+                  onClick={() => eliminarProveedor(p.id)}
+                  title="Eliminar pedido"
+                  style={{ minWidth: "70px", marginRight: "10px" }}
                 >
-                    <i className="bi bi-trash-fill me-1"></i>Eliminar
+                  <i className="bi bi-trash-fill me-1"></i>Eliminar
                 </button>
                 <button
-                    className="btn btn-sm btn-info text-white"
-                    onClick={() => alert(`Generar PDF para pedido: ${p.codigo}`)}
-                    title="Generar PDF"
-                    style={{ minWidth: "70px" }}
+                  className="btn btn-sm btn-info text-white"
+                  onClick={() => alert(`Generar PDF para pedido: ${p.codigo}`)}
+                  title="Generar PDF"
+                  style={{ minWidth: "70px" }}
                 >
-                    <i className="bi bi-file-earmark-pdf-fill me-1"></i>PDF
+                  <i className="bi bi-file-earmark-pdf-fill me-1"></i>PDF
                 </button>
-                </div>
+              </div>
                   </td>
                 </tr>
               ))
@@ -416,7 +400,6 @@ const ProveedoresVer: React.FC = () => {
     </div>
   )}
   </Modal>
-
     </div>
   );
 };

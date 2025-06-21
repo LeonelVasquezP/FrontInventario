@@ -1,18 +1,20 @@
 import React, { useEffect, useState } from "react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+import axiosInstance from "../../Api/axiosConfig";
+import axios from "axios";
 
 interface Proveedor {
   id: number;
   nombre: string;
-  rtn: string;
+  codigo_socio: string;
 }
 
 interface Producto {
   id: number;
   nombre: string;
   codigo: string;
-  precio: number;
+  precio_unitario: number;
 }
 
 interface DetalleCompra {
@@ -29,16 +31,6 @@ interface Compra {
   productos: DetalleCompra[];
 }
 
-const proveedores: Proveedor[] = [
-  { id: 1, nombre: "Distribuidora ABC", rtn: "0801199901234" },
-  { id: 2, nombre: "Comercial XYZ", rtn: "0801200105678" }
-];
-
-const productosDisponibles: Producto[] = [
-  { id: 1, nombre: "Router", codigo: "PR-1001", precio: 1200 },
-  { id: 2, nombre: "Switch", codigo: "PR-1002", precio: 3000 }
-];
-
 const CrearCompra: React.FC = () => {
   const [compra, setCompra] = useState<Compra>({
     numeroFactura: "",
@@ -52,19 +44,28 @@ const CrearCompra: React.FC = () => {
   const [textoProducto, setTextoProducto] = useState("");
   const [productoSeleccionado, setProductoSeleccionado] = useState<number>(0);
   const [busquedaProveedor, setBusquedaProveedor] = useState("");
+  const [proveedores, setProveedores] = useState<Proveedor[]>([]);
+  const [productosDisponibles, setProductosDisponibles] = useState<Producto[]>([]);
 
-  // Simular fetch desde backend
   useEffect(() => {
-    const fetchUltimaFactura = async () => {
+    const fetchData = async () => {
       try {
-        const ultimaFactura = "FAC-0012";
-        const nuevoNumero = generarSiguienteNumero(ultimaFactura);
-        setCompra((prev) => ({ ...prev, numeroFactura: nuevoNumero }));
+        const [resProveedores, resProductos] = await Promise.all([
+          axiosInstance.get("/proveedores"),
+          axiosInstance.get("/productos")
+        ]);
+        setProveedores(resProveedores.data);
+        setProductosDisponibles(resProductos.data);
       } catch (error) {
-        console.error("Error al obtener el número de factura", error);
+        console.error("❌ Error al cargar datos:", error);
+        alert("No se pudieron cargar proveedores o productos.");
       }
     };
-    fetchUltimaFactura();
+    fetchData();
+
+    const ultimaFactura = "FAC-0012";
+    const nuevoNumero = generarSiguienteNumero(ultimaFactura);
+    setCompra(prev => ({ ...prev, numeroFactura: nuevoNumero }));
   }, []);
 
   const generarSiguienteNumero = (ultimo: string): string => {
@@ -86,10 +87,7 @@ const CrearCompra: React.FC = () => {
   const agregarProducto = () => {
     if (!productoSeleccionado) return;
     const yaExiste = compra.productos.some(p => p.productoId === productoSeleccionado);
-    if (yaExiste) {
-      alert("Este producto ya ha sido agregado.");
-      return;
-    }
+    if (yaExiste) return alert("Este producto ya ha sido agregado.");
     setCompra({
       ...compra,
       productos: [...compra.productos, { productoId: productoSeleccionado, cantidad: 1 }]
@@ -105,16 +103,13 @@ const CrearCompra: React.FC = () => {
   };
 
   const eliminarProducto = (productoId: number) => {
-    setCompra({
-      ...compra,
-      productos: compra.productos.filter(p => p.productoId !== productoId)
-    });
+    setCompra({ ...compra, productos: compra.productos.filter(p => p.productoId !== productoId) });
   };
 
   const calcularTotal = () => {
     return compra.productos.reduce((total, item) => {
       const prod = productosDisponibles.find(p => p.id === item.productoId);
-      return total + (prod ? prod.precio * item.cantidad : 0);
+      return total + (prod ? prod.precio_unitario * item.cantidad : 0);
     }, 0);
   };
 
@@ -126,6 +121,50 @@ const CrearCompra: React.FC = () => {
     setBusquedaProveedor(nombre);
   };
 
+  const guardarCompra = async () => {
+    if (!compra.proveedorId || compra.productos.length === 0) {
+      alert("Proveedor y productos son obligatorios.");
+      return;
+    }
+
+    try {
+      const payload = {
+        numero_orden: compra.numeroFactura,
+        fecha: compra.fechaCompra,
+        proveedor_id: compra.proveedorId,
+        estado: "pendiente",
+        metodo_pago: compra.metodoPago,
+        observaciones: compra.observaciones,
+        detalle: compra.productos.map(p => ({
+          producto_id: p.productoId,
+          cantidad: p.cantidad
+        }))
+      };
+
+      await axiosInstance.post("/ordenes", payload);
+
+      alert("Compra registrada exitosamente.");
+
+      setCompra({
+        numeroFactura: generarSiguienteNumero(compra.numeroFactura),
+        proveedorId: 0,
+        fechaCompra: new Date().toISOString().split("T")[0],
+        metodoPago: "",
+        observaciones: "",
+        productos: []
+      });
+      setBusquedaProveedor("");
+    } catch (error: any) {
+      if (axios.isAxiosError(error)) {
+        console.error("❌ Error del servidor:", error.response?.data || error.message);
+        alert("Error del servidor: " + (error.response?.data?.error || error.message));
+      } else {
+        console.error("❌ Error desconocido:", error);
+        alert("Error inesperado al registrar la compra.");
+      }
+    }
+  };
+
   return (
     <div className="container mt-5">
       <h3 className="fw-bold mb-4">
@@ -135,13 +174,7 @@ const CrearCompra: React.FC = () => {
       <div className="row g-3">
         <div className="col-md-6">
           <label className="form-label">Número de Factura</label>
-          <input
-            type="text"
-            name="numeroFactura"
-            className="form-control"
-            value={compra.numeroFactura}
-            readOnly
-          />
+          <input type="text" name="numeroFactura" className="form-control" value={compra.numeroFactura} readOnly />
         </div>
 
         <div className="col-md-6">
@@ -245,11 +278,11 @@ const CrearCompra: React.FC = () => {
         <tbody>
           {compra.productos.map((detalle, index) => {
             const producto = productosDisponibles.find(p => p.id === detalle.productoId);
-            const subtotal = producto ? producto.precio * detalle.cantidad : 0;
+            const subtotal = producto ? producto.precio_unitario * detalle.cantidad : 0;
             return (
               <tr key={index}>
                 <td>{producto?.nombre}</td>
-                <td>L. {producto?.precio}</td>
+                <td>L. {producto?.precio_unitario}</td>
                 <td>
                   <input
                     type="number"
@@ -279,7 +312,7 @@ const CrearCompra: React.FC = () => {
       <h5 className="text-end mt-4">Total: <strong>L. {calcularTotal()}</strong></h5>
 
       <div className="text-end mt-4">
-        <button className="btn btn-success px-4">
+        <button className="btn btn-success px-4" onClick={guardarCompra}>
           <i className="bi bi-check2-circle me-2"></i>Guardar Compra
         </button>
       </div>
