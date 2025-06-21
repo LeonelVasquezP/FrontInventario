@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import "../../assets/Stylees.css";
+import "../../assets/SideNavBar.css";
 
 const menuItems = [
   { path: '/dashboard', label: 'Dashboard', icon: 'bi-speedometer2' },
-
   {
     label: 'Compras',
     icon: 'bi-bag',
@@ -13,7 +13,6 @@ const menuItems = [
       { path: '/VerCompras', label: 'Ver Compras' },
     ],
   },
-
   {
     label: 'Pedidos',
     icon: 'bi-truck',
@@ -22,11 +21,23 @@ const menuItems = [
       { path: '/PedidosVer', label: 'Ver Pedidos' },
     ],
   },
-
-  { path: '/recibidos', label: 'Recibidos', icon: 'bi-box-arrow-in-down' },
-  { path: '/devoluciones', label: 'Devoluciones', icon: 'bi-arrow-counterclockwise' },
+  {
+    label: 'Recibos',
+    icon: 'bi-box-arrow-in-down',
+    submenu: [
+      { path: '/CrearRecibos', label: 'Crear Recibo' },
+      { path: '/VerRecibos', label: 'Ver Recibos' },
+    ],
+  },
+  {
+    label: 'Devoluciones',
+    icon: 'bi-arrow-counterclockwise',
+    submenu: [
+      { path: '/CrearDevolucionCliente', label: 'Crear Devolución' },
+      { path: '/VerDevolucionesCliente', label: 'Ver Devoluciones' },
+    ],
+  },
   { path: '/stock', label: 'Stock', icon: 'bi-box-seam' },
-
   {
     label: 'Proveedores',
     icon: 'bi-people',
@@ -35,8 +46,14 @@ const menuItems = [
       { path: '/ProveedoresVer', label: 'Ver Proveedores' },
     ],
   },
-
-  { path: '/productos', label: 'Productos', icon: 'bi-cart3' },
+  {
+    label: 'Productos',
+    icon: 'bi-cart3',
+    submenu: [
+      { path: '/CrearProductos', label: 'Crear Producto' },
+      { path: '/VerProductos', label: 'Ver Productos' },
+    ],
+  },
   { path: '/almacenes', label: 'Almacenes', icon: 'bi-building' },
   { path: '/clientes', label: 'Clientes', icon: 'bi-person' },
   { path: '/usuarios', label: 'Administración', icon: 'bi-gear' },
@@ -55,7 +72,12 @@ const SideNavbar: React.FC = () => {
   return (
     <aside
       className="position-fixed vh-100 d-flex flex-column shadow-sm"
-      style={{ width: '220px', top: '56px', backgroundColor: '#1e293b' }}
+      style={{
+        width: '220px',
+        top: '56px',
+        backgroundColor: '#1e293b',
+        zIndex: 1050,
+      }}
     >
       <div className="px-3 pt-4 pb-2">
         <ul className="nav flex-column">

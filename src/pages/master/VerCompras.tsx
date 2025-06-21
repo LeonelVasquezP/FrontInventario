@@ -240,6 +240,8 @@ const VerCompras: React.FC = () => {
                 <td>{c.metodoPago}</td>
                 <td>
                   <div>
+
+
                     <button
                       className="btn btn-sm btn-primary"
                       onClick={() => abrirModalEdicion(c)}
@@ -264,6 +266,8 @@ const VerCompras: React.FC = () => {
                     >
                       <i className="bi bi-file-earmark-pdf-fill me-1"></i>PDF
                     </button>
+
+                    
                   </div>
                 </td>
               </tr>

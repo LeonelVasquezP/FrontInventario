@@ -6,15 +6,18 @@ import SideNavbar from './components/ComponentesReutilizables/SideNavbar';
 import Footer from './components/ComponentesReutilizables/Footer';
 import Login from './pages/Login';
 import Home from './pages/Home';
-import Productos from './pages/master/Productos';
+import CrearProductos from './pages/master/CrearProductos';
+import VerProductos from './pages/master/VerProductos';
 import ProveedoresCrear from './pages/master/ProveedoresCrear';
 import ProveedoresVer from './pages/master/ProveedoresVer';
 import CrearCompra from './pages/master/CrearCompra';
 import VerCompras from './pages/master/VerCompras';
 import Stock from './pages/master/Stock';
 import Clientes from './pages/master/Clientes';
-import Recibidos from './pages/master/Recibidos';
-import Devoluciones from './pages/master/Devoluciones';
+import CrearRecibos from './pages/master/CrearRecibos';
+import VerRecibos from './pages/master/VerRecibos';
+import CrearDevolucionCliente from './pages/master/CrearDevolucionCliente';
+import VerDevolucionesCliente from './pages/master/VerDevolucionesCliente';
 import AlmacenComponent from './pages/master/Almacenes';
 import Dashboard from './pages/master/Dashboard';
 import Departamentos from './pages/master/Departamentos';
@@ -39,17 +42,21 @@ function App() {
               <div style={{ marginLeft: '220px', marginTop: '56px', padding: '20px', flex: 1 }}>
                 <Routes>
                   <Route path="/" element={<Navigate to="/home" />} />
-                  <Route path="/productos" element={<Productos />} />
+                  
+                  <Route path="/VerProductos" element={<VerProductos />} />
+                  <Route path="/CrearProductos" element={<CrearProductos />} />
                   <Route path="/CrearCompra" element={<CrearCompra />} />
                   <Route path="/VerCompras" element={<VerCompras />} />
                    <Route path="/stock" element={<Stock />} />
                    <Route path="/clientes" element={<Clientes />} />
-                   <Route path="/recibidos" element={<Recibidos />} />
+                   <Route path="/CrearRecibos" element={<CrearRecibos />} />
+                   <Route path="/VerRecibos" element={<VerRecibos />} />
                    <Route path="/PedidosCrear" element={<PedidosCrear />} />
                    <Route path="/PedidosVer" element={<PedidosVer />} />
                     <Route path="/ProveedoresCrear" element={<ProveedoresCrear />} />
                    <Route path="/ProveedoresVer" element={<ProveedoresVer />} />
-                  <Route path="/devoluciones" element={<Devoluciones />} />
+                  <Route path="/CrearDevolucionCliente" element={<CrearDevolucionCliente />} />
+                  <Route path="/VerDevolucionesCliente" element={<VerDevolucionesCliente />} />
                   <Route path="/almacenes" element={<AlmacenComponent />} />
                   <Route path="/dashboard" element={<Dashboard />} />
                   <Route path="/departamentos" element={<Departamentos />} />
